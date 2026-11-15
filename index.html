@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Tine — phone kalimba</title>
+<title>Kalimbasizer</title>
 <meta name="theme-color" content="#EFECE4">
-<meta name="description" content="Tine — a thumb-friendly kalimba-style instrument for your phone, with synth voices and a built-in recorder.">
+<meta name="description" content="Kalimbasizer — a thumb-friendly kalimba-style instrument for your phone, with synth voices and a built-in recorder.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Tine">
+<meta name="apple-mobile-web-app-title" content="Kalimbasizer">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -90,7 +90,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
   <button class="cap wide nar" id="bTakes"><span class="lbl">TAKES</span><span class="val">0</span></button>
 </div>
 <div id="sheet"><div class="bg"></div><div class="pane"><div class="hd"><span id="shTitle"></span><button id="shDone">DONE</button></div><div class="grid" id="shGrid"></div></div></div>
-<div id="start"><svg viewBox="-4 -4 300 342" aria-hidden="true"><rect x="10" y="10" width="280" height="322" rx="50" fill="#1C1C1B"/><rect x="0" y="0" width="280" height="322" rx="50" fill="#F2B8A2" stroke="#1C1C1B" stroke-width="4"/><circle cx="140" cy="280" r="17" fill="#1C1C1B"/><rect class="tn" style="animation-delay:0.36s" x="26" y="36" width="24" height="118" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.24s" x="60" y="36" width="24" height="150" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.12s" x="94" y="36" width="24" height="180" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0s" x="128" y="36" width="24" height="208" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.18s" x="162" y="36" width="24" height="180" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.3s" x="196" y="36" width="24" height="150" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.42s" x="230" y="36" width="24" height="118" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect x="14" y="60" width="252" height="15" rx="7.5" fill="#1C1C1B"/><circle cx="24" cy="67.5" r="3" fill="#F2B8A2"/><circle cx="256" cy="67.5" r="3" fill="#F2B8A2"/></svg><h1>MEGA KALIMBA</h1><div class="go">tap to start</div></div>
+<div id="start"><svg viewBox="-4 -4 300 342" aria-hidden="true"><rect x="10" y="10" width="280" height="322" rx="50" fill="#1C1C1B"/><rect x="0" y="0" width="280" height="322" rx="50" fill="#F2B8A2" stroke="#1C1C1B" stroke-width="4"/><circle cx="140" cy="280" r="17" fill="#1C1C1B"/><rect class="tn" style="animation-delay:0.36s" x="26" y="36" width="24" height="118" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.24s" x="60" y="36" width="24" height="150" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.12s" x="94" y="36" width="24" height="180" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0s" x="128" y="36" width="24" height="208" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.18s" x="162" y="36" width="24" height="180" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.3s" x="196" y="36" width="24" height="150" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.42s" x="230" y="36" width="24" height="118" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect x="14" y="60" width="252" height="15" rx="7.5" fill="#1C1C1B"/><circle cx="24" cy="67.5" r="3" fill="#F2B8A2"/><circle cx="256" cy="67.5" r="3" fill="#F2B8A2"/></svg><h1>KALIMBASIZER</h1><div class="go">tap to start</div></div>
 <script>
 const INK='#1C1C1B', PAPER='#EFECE4', G1='#D9D6CE', G2='#9A978F', CREAM='#FBF8F1', TE='#FF6A2B', BLUSH='#F59BB0';
 let TOP=78;const BPM=84, BEAT=60/BPM, PI=Math.PI, TAU=PI*2, ROOT=261.63;
@@ -470,7 +470,7 @@ function openTakes(){stopPlay();$('shTitle').textContent=`TAKES · ${takes.lengt
     pl.onclick=()=>togglePlay(tk,pl);
     rm.onclick=()=>{if(rm.dataset.armed){if(playing&&playing.tk===tk)stopPlay();takes=takes.filter(t=>t!==tk);delTake(tk.id);syncTakes();openTakes()}
       else{rm.dataset.armed=1;rm.textContent='del?';setTimeout(()=>{if(rm.isConnected){delete rm.dataset.armed;rm.textContent='×'}},2500)}};
-    sv.onclick=async()=>{const ext=/mp4/.test(tk.mime)?'mp4':'webm',name=`tine ${tk.name}.${ext}`;try{if(dlNS)await dlNS.save({filename:name,data:tk.blob});else await saveLocal(name,tk.blob,tk.mime);sv.textContent='✓'}catch(e){sv.textContent=e&&(e.code==='declined'||e.name==='AbortError')?'↓':'!'}};
+    sv.onclick=async()=>{const ext=/mp4/.test(tk.mime)?'mp4':'webm',name=`kalimbasizer ${tk.name}.${ext}`;try{if(dlNS)await dlNS.save({filename:name,data:tk.blob});else await saveLocal(name,tk.blob,tk.mime);sv.textContent='✓'}catch(e){sv.textContent=e&&(e.code==='declined'||e.name==='AbortError')?'↓':'!'}};
     shGrid.appendChild(row)});
   sheet.classList.add('open')}
 press($('bRec'),()=>{if(REC_MIME===null){say('rec not supported here');return}if(!AC)return;rec?stopRec():startRec()});

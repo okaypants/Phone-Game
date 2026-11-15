@@ -1,4 +1,4 @@
-# Tine
+# Kalimbasizer
 
 A thumb-friendly, kalimba-style instrument for your phone. The kalimba is the interface, but the sounds go well past it: five plucked voices (wood, felt, music box, metal, glow) and seven synth voices (dream pad, 808, Moog-style ladder bass, ARP-style lead, electro square, string machine, formant vox). It has a recorder built in.
 

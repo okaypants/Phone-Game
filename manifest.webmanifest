@@ -1,6 +1,6 @@
 {
-  "name": "Tine — phone kalimba",
-  "short_name": "Tine",
+  "name": "Kalimbasizer",
+  "short_name": "Kalimbasizer",
   "description": "A thumb-friendly kalimba-style instrument with synth voices and a built-in recorder.",
   "start_url": "./",
   "scope": "./",
