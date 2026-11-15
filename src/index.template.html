@@ -18,11 +18,11 @@
 :root{--paper:#EFECE4;--ink:#1C1C1B;--g1:#D9D6CE;--g2:#9A978F;--te:#FF6A2B}
 html,body{margin:0;height:100%;background:var(--paper);overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:block}
-#panel{position:fixed;top:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:10px 12px 0;z-index:2;font-family:'IBM Plex Mono',ui-monospace,monospace;max-width:660px;margin:0 auto}
-.cap{position:relative;height:58px;min-width:0;border:1.4px solid var(--ink);border-radius:15px;background:#F7F4EE;box-shadow:3px 3px 0 var(--ink);color:var(--ink);text-align:left;padding:8px 9px;font:inherit;-webkit-tap-highlight-color:transparent;cursor:pointer;transition:transform .05s,box-shadow .05s}
+#panel{position:fixed;top:0;left:0;right:0;display:grid;grid-template-columns:repeat(20,1fr);gap:8px;padding:10px 12px 0;z-index:2;font-family:'IBM Plex Mono',ui-monospace,monospace;max-width:660px;margin:0 auto}
+.cap{position:relative;grid-column:span 4;height:58px;min-width:0;border:1.4px solid var(--ink);border-radius:15px;background:#F7F4EE;box-shadow:3px 3px 0 var(--ink);color:var(--ink);text-align:left;padding:8px 9px;font:inherit;-webkit-tap-highlight-color:transparent;cursor:pointer;transition:transform .05s,box-shadow .05s}
 .cap.down{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 .cap .lbl{display:block;font-size:8.5px;letter-spacing:.1em;opacity:.5;white-space:nowrap;overflow:hidden;padding-right:12px}
-@media (max-width:440px){.cap .num{display:none}}
+@media (max-width:900px){.cap .num{display:none}}
 .cap .val{display:block;font-size:15px;font-weight:600;margin-top:9px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:clip}
 .cap .led{position:absolute;right:8px;top:8px;width:7px;height:7px;border-radius:50%;background:#D3CFC6;border:1px solid var(--ink);box-sizing:border-box}
 .cap.on .led{background:var(--te);box-shadow:0 0 6px var(--te)}
@@ -41,18 +41,19 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
 .opt.sel{background:var(--ink);color:var(--paper)}
 .opt .sw{position:absolute;right:10px;top:10px;width:12px;height:12px;border-radius:50%;border:1px solid var(--ink)}
 .opt.sel .sw{border-color:var(--paper)}
-.cap.oct{grid-column:span 2;display:flex;align-items:stretch;padding:0;height:50px}
-.cap.oct button{flex:0 0 30%;font:600 22px/1 'IBM Plex Mono',monospace;background:transparent;border:none;color:var(--ink);-webkit-tap-highlight-color:transparent}
+.cap.oct{grid-column:span 6;display:flex;align-items:stretch;padding:0;height:50px}
+.cap.oct button{flex:0 0 31%;font:600 22px/1 'IBM Plex Mono',monospace;background:transparent;border:none;color:var(--ink);-webkit-tap-highlight-color:transparent}
 .cap.oct button:first-child{border-right:1.4px solid var(--ink)}.cap.oct button:last-child{border-left:1.4px solid var(--ink)}
 .cap.oct button.down{background:var(--g1)}
-.cap.oct .mid{flex:1;text-align:center;padding-top:8px}.cap.oct .val{margin-top:5px}
-.cap.wide{grid-column:span 1;height:50px}.cap.wide .val{margin-top:6px}
-@media (min-aspect-ratio:11/10){#panel{grid-template-columns:repeat(5,1fr) 1.6fr 1fr 1fr 1fr;max-width:1100px}.cap.oct,.cap.wide{grid-column:auto;height:58px}.cap.wide .val{margin-top:9px}}
+.cap.oct .mid{flex:1;min-width:0;text-align:center;padding-top:8px}.cap.oct .lbl{padding-right:0;letter-spacing:.04em}.cap.oct .val{margin-top:5px}
+.cap.wide{grid-column:span 4;height:50px}.cap.wide .val{margin-top:6px}
+.cap.nar{grid-column:span 3;padding:8px 6px}
+@media (min-aspect-ratio:11/10){#panel{grid-template-columns:repeat(5,1fr) 1.6fr 1fr 1fr 1fr 1fr;max-width:1100px}.cap,.cap.oct,.cap.wide,.cap.nar{grid-column:auto;height:58px}.cap.wide .val{margin-top:9px}}
 #bRec .val{color:#D8352A}
 #bRec.recording{background:var(--ink);color:var(--paper)}
 #bRec.recording .lbl{opacity:.7}
 #bRec.recording .led{background:#E5372B;box-shadow:0 0 8px #E5372B;animation:blink 1s steps(2) infinite}
-#bRec.recording .val{color:var(--paper);font-size:13px}
+#bRec.recording .val{color:var(--paper);font-size:12px}
 @keyframes blink{50%{opacity:.25}}
 .take{display:flex;align-items:center;gap:8px;border:1.4px solid var(--ink);border-radius:14px;background:#F7F4EE;box-shadow:3px 3px 0 var(--ink);padding:7px}
 .take button{flex:0 0 46px;height:46px;border:1.4px solid var(--ink);border-radius:11px;background:transparent;color:var(--ink);font:600 16px/1 'IBM Plex Mono',monospace;-webkit-tap-highlight-color:transparent}
@@ -78,8 +79,9 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
   <button class="cap on" id="bSpace"><span class="lbl"><span class="num">05 </span>SPACE</span><span class="val">on</span><i class="led"></i></button>
   <div class="cap oct" id="oct"><button id="oDn" aria-label="octave down">−</button><span class="mid"><span class="lbl">OCTAVE</span><span class="val" id="oVal">0</span></span><button id="oUp" aria-label="octave up">+</button></div>
   <button class="cap wide" id="bGlide"><span class="lbl">GLIDE</span><span class="val">short</span><i class="led"></i></button>
-  <button class="cap wide" id="bRec"><span class="lbl">REC</span><span class="val">●</span><i class="led"></i></button>
-  <button class="cap wide" id="bTakes"><span class="lbl">TAKES</span><span class="val">0</span></button>
+  <button class="cap wide" id="bMet"><span class="lbl">CLICK</span><span class="val">off</span><i class="led"></i></button>
+  <button class="cap wide nar" id="bRec"><span class="lbl">REC</span><span class="val">●</span><i class="led"></i></button>
+  <button class="cap wide nar" id="bTakes"><span class="lbl">TAKES</span><span class="val">0</span></button>
 </div>
 <div id="sheet"><div class="bg"></div><div class="pane"><div class="hd"><span id="shTitle"></span><button id="shDone">DONE</button></div><div class="grid" id="shGrid"></div></div></div>
 <div id="start"><div class="k"><i></i><i></i><i></i></div><div>tap to start</div><small>thumbs · tap · slide to strum</small></div>
@@ -98,9 +100,9 @@ const $=id=>document.getElementById(id);
 
 /*AUDIO*/
 
-const SOUNDS=[['wood','#F2B8A2'],['glass','#A9C6D9'],['felt','#BFD8B8'],['box','#F3E3A1'],['metal','#C9C3E6'],['pluck','#E8C4D4'],
+const SOUNDS=[['wood','#F2B8A2'],['dream','#D48E8E'],['felt','#BFD8B8'],['box','#F3E3A1'],['metal','#C9C3E6'],['glow','#B8E2DC'],
  ['808','#BDBBB4'],['moog','#C9B8A3'],['arp','#AFBBC2'],['electro','#D3D0C8'],['strings','#C6C3B6'],['vox','#B8B0A8']];
-const SOUND_SUB=['warm kalimba','fm bell','soft piano','music box','gamelan','synth pluck','808 bass · glide · dry','ladder bass · mono glide','odyssey lead · mono glide','square lead · poly · dry','string machine · poly','formant voice · mono glide'];
+const SOUND_SUB=['warm kalimba','slow fm keys · pad','soft piano','music box','gamelan','magic chime','808 bass · glide · dry','ladder bass · mono glide','odyssey lead · mono glide','square lead · poly · dry','string machine · poly','formant voice · mono glide'];
 const ROOTS=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 const ROOT_ALT=['','D♭','','D♯','','','G♭','','G♯','','A♯',''];
 const SCALE_LIST=[['maj','major',[0,2,4,5,7,9,11]],['min','natural minor',[0,2,3,5,7,8,10]],['dor','dorian',[0,2,3,5,7,9,10]],['phr','phrygian',[0,1,3,5,7,8,10]],
@@ -111,8 +113,8 @@ let rootI=0,scaleI=0;
 const TUNE=()=>[ROOTS[rootI]+' '+SCALE_LIST[scaleI][0],261.63*Math.pow(2,(rootI>=6?rootI-12:rootI)/12),SCALE_LIST[scaleI][2]];
 const stepsOf=S=>S.map((v,i)=>((i+1<S.length?S[i+1]:12)-v)).map(d=>d===1?'H':d===2?'W':d===3?'3':d===4?'4':d).join(' ');
 // rows × keys per row; every key stays ≥ ~45px wide for thumbs
-const OPTS={p:[[2,7],[3,7],[2,8],[3,8]],l:[[2,11],[2,13],[2,15]]};
-let soundI=0,space=true,optP=0,optL=1;
+const OPTS={p:[[1,5],[2,5],[1,7],[2,7],[3,7],[2,8],[3,8]],l:[[1,7],[1,9],[2,9],[2,11],[2,13],[2,15]]};
+let soundI=0,space=true,optP=3,optL=4;
 const isLand=()=>W>H*1.1;
 const cfg=()=>isLand()?OPTS.l[optL]:OPTS.p[optP];
 function baseRoot(){const[,root,S]=TUNE(),[r,n]=cfg(),N=r*n;let d=clamp(Math.floor(N/S.length/2-.5),0,3);while(d>0&&root/Math.pow(2,d)<60)d--;return root/Math.pow(2,d)}
@@ -239,7 +241,7 @@ const sheet=$('sheet'),shGrid=$('shGrid');
 function closeSheet(){sheet.classList.remove('open');stopPlay()}
 function openSheet(title,opts,minW){$('shTitle').textContent=title;shGrid.style.gridTemplateColumns=`repeat(auto-fill,minmax(${minW}px,1fr))`;shGrid.innerHTML='';
   opts.forEach(o=>{const b=document.createElement('button');b.className='opt'+(o.sel?' sel':'');b.innerHTML=`<b>${o.label}</b>${o.sub?`<small>${o.sub}</small>`:''}${o.sw?`<i class="sw" style="background:${o.sw}"></i>`:''}`;
-    b.addEventListener('click',()=>{o.act();buzz(8);closeSheet();setTimeout(preview,60)});shGrid.appendChild(b)});sheet.classList.add('open')}
+    b.addEventListener('click',()=>{o.act();buzz(8);closeSheet();o.quiet||setTimeout(preview,60)});shGrid.appendChild(b)});sheet.classList.add('open')}
 sheet.querySelector('.bg').addEventListener('click',closeSheet);$('shDone').addEventListener('click',closeSheet);
 function syncCaps(){const sv=$('bSound').querySelector('.val');sv.textContent=SOUNDS[soundI][0];sv.style.fontSize=SOUNDS[soundI][0].length>5&&innerWidth<440?'11.5px':'';setSwatch();$('bRoot').querySelector('.val').textContent=ROOTS[rootI];$('bScale').querySelector('.val').textContent=SCALE_LIST[scaleI][0]}
 function setOct(d){const n=clamp(octave+d,-3,2);if(n===octave){buzz([4,30,4]);return}octave=n;$('oVal').textContent=(octave>0?'+':'')+octave;
@@ -262,7 +264,18 @@ function openTakes(){stopPlay();$('shTitle').textContent=`TAKES · ${takes.lengt
 press($('bRec'),()=>{if(REC_MIME===null){say('rec not supported here');return}if(!AC)return;rec?stopRec():startRec()});
 press($('bTakes'),openTakes);
 if(REC_MIME===null)$('bRec').querySelector('.val').textContent='n/a';
-press($('bKeys'),()=>{if(isLand())optL=(optL+1)%OPTS.l.length;else optP=(optP+1)%OPTS.p.length;geo();preview()});
+press($('bKeys'),()=>{const land=isLand(),list=land?OPTS.l:OPTS.p,cur=land?optL:optP;
+  openSheet('04 · ROWS',list.map(([r,n],i)=>({label:`${r}×${n}`,sub:`${r*n} keys`,sel:i===cur,act:()=>{if(land)optL=i;else optP=i;pointers.forEach((p,id)=>{noteOff(p.h,id);p.h=null;p.t=null});geo()}})),84)});
+// ───────── metronome: goes straight to the speakers, bypassing the chain the recorder taps ─────────
+const TEMPOS=[60,72,84,96,108,120,132,144,160];let metOn=false,metBpm=84,metNext=0,metBeat=0,metTimer=null,metGain=null,metFlash=-1e9;
+function metTick(){if(!AC||!metOn)return;while(metNext<now()+.12){const t=Math.max(metNext,now()),acc=metBeat%4===0,o=AC.createOscillator(),g=AC.createGain();
+  o.frequency.value=acc?1760:1320;o.connect(g);g.connect(metGain);adsr(g.gain,t,.001,acc?.5:.3,.045);o.start(t);o.stop(t+.08);
+  setTimeout(()=>{metFlash=performance.now()},Math.max(0,(t-now())*1000));metBeat++;metNext+=60/metBpm}}
+function setMet(bpm){clearInterval(metTimer);metOn=!!bpm&&!!AC;const el=$('bMet');el.querySelector('.val').textContent=metOn?bpm:'off';if(!metOn){el.classList.remove('on');return}
+  metBpm=bpm;if(!metGain){metGain=AC.createGain();metGain.gain.value=.5;metGain.connect(AC.destination)}
+  dIn.delayTime.setTargetAtTime(60/bpm*.75,now(),.05); // echo follows the tempo
+  metNext=now()+.1;metBeat=0;metTimer=setInterval(metTick,25)}
+press($('bMet'),()=>openSheet('CLICK · not recorded',[{label:'off',sub:'silent',sel:!metOn,quiet:true,act:()=>setMet(0)}].concat(TEMPOS.map(b=>({label:b,sub:'bpm',sel:metOn&&b===metBpm,quiet:true,act:()=>setMet(b)}))),76));
 press($('bSpace'),()=>{space=!space;$('bSpace').classList.toggle('on',space);$('bSpace').querySelector('.val').textContent=space?'on':'dry';
   if(AC){ds.gain.setTargetAtTime(space?.26:.04,now(),.1);rs.gain.setTargetAtTime(space?.38:.14,now(),.1)}});
 
@@ -286,6 +299,7 @@ $('start').addEventListener('click',e=>{e.preventDefault();unlockAudio();started
 let lastT=performance.now();
 function frame(t){const dt=Math.min(3,(t-lastT)/16.667);lastT=t;recent*=Math.pow(.985,dt);
   for(const row of rows)for(const k of row){k.ph+=1.1*dt;k.amp*=Math.pow(.94,dt);k.flash=k.hold>0?1:k.flash*Math.pow(.92,dt);k.squish*=Math.pow(.85,dt)}
+  if(metOn)$('bMet').classList.toggle('on',t-metFlash<110);
   if(rec){const v=$('bRec').querySelector('.val'),f=fmt((t-recStart)/1000);if(v.textContent!==f)v.textContent=f}
   draw(t);requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
