@@ -279,15 +279,16 @@ if(REC_MIME===null)$('bRec').querySelector('.val').textContent='n/a';
 press($('bKeys'),()=>{const land=isLand(),list=land?OPTS.l:OPTS.p,cur=land?optL:optP;
   openSheet('04 · ROWS',list.map(([r,n],i)=>({label:`${r}×${n}`,sub:`${r*n} keys`,sel:i===cur,act:()=>{if(land)optL=i;else optP=i;allOff();pointers.forEach(p=>p.t=null);geo()}})),84)});
 // ───────── metronome: goes straight to the speakers, bypassing the chain the recorder taps ─────────
-const TEMPOS=[60,72,84,96,108,120,132,144,160];let metOn=false,metBpm=84,metNext=0,metBeat=0,metTimer=null,metGain=null,metFlash=-1e9,metShown=0;
+const TEMPOS=[60,72,84,96,108,120,132,144,160];let metOn=false,metBpm=84,metNext=0,metBeat=0,metTimer=null,metGain=null,metFlash=-1e9,metShown=0,metVol=1;const MET_VOLS=[['soft',.3],['loud',.65],['max',1]];
 function metTick(){if(!AC||!metOn)return;while(metNext<now()+.12){const t=Math.max(metNext,now()),acc=metBeat%4===0,o=AC.createOscillator(),g=AC.createGain();
-  o.frequency.value=acc?1760:1320;o.connect(g);g.connect(metGain);adsr(g.gain,t,.001,acc?.5:.3,.045);o.start(t);o.stop(t+.08);
+  o.type='square';o.frequency.value=acc?1570:1050;o.connect(g);g.connect(metGain);adsr(g.gain,t,.001,acc?.45:.3,.035);o.start(t);o.stop(t+.06); // woodblock-ish: square body…
+  const n=noiseSrc(),hp=AC.createBiquadFilter(),ng=AC.createGain();hp.type='highpass';hp.frequency.value=3000;n.connect(hp);hp.connect(ng);ng.connect(metGain);adsr(ng.gain,t,.001,acc?.5:.35,.012);n.start(t);n.stop(t+.03); // …plus a bright tick that cuts through
   const bi=metBeat%4;setTimeout(()=>{metFlash=performance.now();metShown=bi},Math.max(0,(t-now())*1000));metBeat++;metNext+=60/metBpm}}
 function setMet(bpm){clearInterval(metTimer);metOn=!!bpm&&!!AC;const el=$('bMet');el.querySelector('.val').textContent=metOn?bpm:'off';if(!metOn){el.classList.remove('on');return}
-  metBpm=bpm;if(!metGain){metGain=AC.createGain();metGain.gain.value=.5;metGain.connect(AC.destination)}
+  metBpm=bpm;if(!metGain){metGain=AC.createGain();metGain.gain.value=MET_VOLS[metVol][1];metGain.connect(AC.destination)}
   dIn.delayTime.setTargetAtTime(60/bpm*.75,now(),.05); // echo follows the tempo
   metNext=now()+.1;metBeat=0;metTimer=setInterval(metTick,25)}
-press($('bMet'),()=>openSheet('CLICK · not recorded',[{label:'off',sub:'silent',sel:!metOn,quiet:true,act:()=>setMet(0)}].concat(TEMPOS.map(b=>({label:b,sub:'bpm',sel:metOn&&b===metBpm,quiet:true,act:()=>setMet(b)}))),76));
+press($('bMet'),()=>openSheet('CLICK · not recorded',[{label:'off',sub:'silent',sel:!metOn,quiet:true,act:()=>setMet(0)}].concat(TEMPOS.map(b=>({label:b,sub:'bpm',sel:metOn&&b===metBpm,quiet:true,act:()=>setMet(b)})),MET_VOLS.map(([l,v],i)=>({label:l,sub:'volume',sel:i===metVol,quiet:true,act:()=>{metVol=i;if(metGain)metGain.gain.value=v}}))),76));
 press($('bSpace'),()=>{space=!space;$('bSpace').classList.toggle('on',space);$('bSpace').querySelector('.val').textContent=space?'on':'dry';
   if(AC){ds.gain.setTargetAtTime(space?.26:.04,now(),.1);rs.gain.setTargetAtTime(space?.38:.14,now(),.1)}});
 
