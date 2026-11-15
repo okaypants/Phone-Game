@@ -19,6 +19,7 @@ It's a single static web page with no build step, server or dependencies. All so
 - **Click:** an optional metronome (60–160 bpm, three volume levels, accent every fourth beat). You hear it and see it (the CLICK button flashes and four beat dots step along the display), but it isn't recorded. The echo time follows its tempo.
 - **Motes:** a little dust lifts off each key you play, and the keys either side shiver. Play with a steady pulse (or in time with the click) and the dust lasts longer, warms in colour, drifts into a slow swirl and links up; lose the pulse and it sinks and fades. It's off if your phone is set to reduce motion.
 - **Hold:** with HOLD on, the sustaining synths (everything but the 808) keep ringing after you lift your finger. Tap a lit key again to stop it, or turn HOLD off to stop them all. Poly voices stack into chords; mono voices keep the last note.
+- **Greyed-out buttons:** GLIDE, HOLD and SPACE grey out when they do nothing for the current sound (GLIDE is for the mono synths, HOLD for the sustaining synths, and the 808 is always dry).
 - **Recorder:** records the instrument's own output, not the mic. Takes are kept in the browser (IndexedDB), and you can play, save or share, and delete them.
 - **App:** installable to the home screen (PWA) and works offline once loaded.
 

@@ -25,6 +25,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
 @media (max-width:900px){.cap .num{display:none}}
 .cap .val{display:block;font-size:15px;font-weight:600;margin-top:9px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:clip}
 .cap .led{position:absolute;right:8px;top:8px;width:7px;height:7px;border-radius:50%;background:#D3CFC6;border:1px solid var(--ink);box-sizing:border-box}
+.cap.dis{opacity:.32;box-shadow:1px 1px 0 var(--ink);cursor:default}
 .cap.on .led{background:var(--te);box-shadow:0 0 6px var(--te)}
 .cap .sw{position:absolute;right:8px;top:8px;width:10px;height:10px;border-radius:50%;border:1px solid var(--ink);box-sizing:border-box}
 #sheet{position:fixed;inset:0;z-index:4;display:none;font-family:'IBM Plex Mono',ui-monospace,monospace;color:var(--ink)}
@@ -409,7 +410,7 @@ function resize(){TOP=Math.ceil($('panel').getBoundingClientRect().bottom)+2;DPR
 addEventListener('resize',resize);resize();
 
 function setSwatch(){$('bSound').querySelector('.sw').style.background=SOUNDS[soundI][1]}setSwatch();
-const press=(el,fn)=>el.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();el.classList.add('down');setTimeout(()=>el.classList.remove('down'),110);fn();buzz(8);
+const press=(el,fn)=>el.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();if(el.classList.contains('dis'))return;el.classList.add('down');setTimeout(()=>el.classList.remove('down'),110);fn();buzz(8);
   const led=el.querySelector('.led');if(led&&(el.id==='bKeys'||el.id==='bGlide')){el.classList.add('on');setTimeout(()=>el.classList.remove('on'),180)}});
 const preview=()=>{if(!AC)return;const row=rows[rows.length-1];[0,2,4].forEach((k,i)=>setTimeout(()=>{const t=row.find(t=>t.k===k);if(t){const id='pv'+i,h=noteOn(t,t.bridgeY+t.len*.8,.45,id);h&&setTimeout(()=>noteOff(h,id),220)}},i*90))};
 press($('bSound'),()=>openSheet('01 · SOUND',SOUNDS.map((so,i)=>({label:so[0],sub:SOUND_SUB[i],sw:so[1],sel:i===soundI,act:()=>{allOff();soundI=i;syncCaps()}})),120));
@@ -450,10 +451,13 @@ function openSheet(title,opts,minW){$('shTitle').textContent=title;shGrid.style.
   opts.forEach(o=>{const b=document.createElement('button');b.className='opt'+(o.sel?' sel':'');b.innerHTML=`<b>${o.label}</b>${o.sub?`<small>${o.sub}</small>`:''}${o.sw?`<i class="sw" style="background:${o.sw}"></i>`:''}`;
     b.addEventListener('click',()=>{o.act();buzz(8);closeSheet();o.quiet||setTimeout(preview,60)});shGrid.appendChild(b)});sheet.classList.add('open')}
 sheet.querySelector('.bg').addEventListener('click',closeSheet);$('shDone').addEventListener('click',closeSheet);
-function syncCaps(){const sv=$('bSound').querySelector('.val');sv.textContent=SOUNDS[soundI][0];sv.style.fontSize=SOUNDS[soundI][0].length>5&&innerWidth<440?'11.5px':'';setSwatch();$('bRoot').querySelector('.val').textContent=ROOTS[rootI];$('bScale').querySelector('.val').textContent=SCALE_LIST[scaleI][0]}
+function syncCaps(){const sv=$('bSound').querySelector('.val');sv.textContent=SOUNDS[soundI][0];sv.style.fontSize=SOUNDS[soundI][0].length>5&&innerWidth<440?'11.5px':'';setSwatch();$('bRoot').querySelector('.val').textContent=ROOTS[rootI];$('bScale').querySelector('.val').textContent=SCALE_LIST[scaleI][0];
+  // grey out controls that do nothing for this sound: glide is mono-synth only, hold needs a sustaining synth, the 808 has no echo/room
+  const ty=SOUNDS[soundI][0];$('bGlide').classList.toggle('dis',MONO[ty]===undefined);$('bHold').classList.toggle('dis',!canLatch());$('bSpace').classList.toggle('dis',ty==='808')}
 function setOct(d){const n=clamp(octave+d,-3,2);if(n===octave){buzz([4,30,4]);return}octave=n;$('oVal').textContent=(octave>0?'+':'')+octave;
   allOff();preview()}
 ['oDn','oUp'].forEach((id,i)=>{const el=$(id);el.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();el.classList.add('down');setTimeout(()=>el.classList.remove('down'),110);buzz(8);setOct(i?1:-1)})});
+syncCaps();
 press($('bRoot'),()=>openSheet('02 · KEY',ROOTS.map((r,i)=>({label:r,sub:ROOT_ALT[i],sel:i===rootI,act:()=>{allOff();rootI=i;syncCaps()}})),62));
 press($('bScale'),()=>openSheet('03 · SCALE',SCALE_LIST.map((sc,i)=>({label:sc[1],sub:stepsOf(sc[2]),sel:i===scaleI,act:()=>{allOff();scaleI=i;syncCaps()}})),140));
 press($('bHold'),()=>{latch=!latch;$('bHold').classList.toggle('on',latch);$('bHold').querySelector('.val').textContent=latch?'on':'off';if(!latch)[...held.keys()].forEach(dropHeld)});
