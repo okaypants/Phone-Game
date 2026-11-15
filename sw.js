@@ -1,5 +1,5 @@
 # Kalimbasizer
-const CACHE = 'kalimbasizer-v4';
+const CACHE = 'kalimbasizer-v5';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
