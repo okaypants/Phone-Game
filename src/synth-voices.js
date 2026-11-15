@@ -1,10 +1,10 @@
 
 // ───────── synth voices (gated: ring while held) ─────────
-const SYN_TYPES=['808','moog','arp','electro','strings','vox'];
+const SYN_TYPES=['dream','808','moog','arp','electro','strings','vox'];
 // fixed character per instrument (no kalimba-style position/velocity response)
-const SYN_TONE={'808':.55,moog:.55,arp:.6,electro:.5,strings:.5,vox:.5};
+const SYN_TONE={dream:.5,'808':.55,moog:.55,arp:.6,electro:.5,strings:.5,vox:.5};
 // [delay send, reverb send] per instrument — 808 and electro stay dry
-const SYN_FX={'808':[0,0],moog:[0,.04],arp:[.1,.14],electro:[0,.05],strings:[0,.32],vox:[.06,.16]};
+const SYN_FX={dream:[.05,.6],'808':[0,0],moog:[0,.04],arp:[.1,.14],electro:[0,.05],strings:[0,.32],vox:[.06,.16]};
 // monophonic instruments glide (portamento) between held notes
 const MONO={'808':.075,moog:.06,arp:.09,vox:.08};
 let masterOut=null,driveCurve=null,dryBus=null,dIn=null,rIn=null;
@@ -46,8 +46,16 @@ function synth(type,f,pn){if(!AC)return null;const bright=SYN_TONE[type],v=.8,t=
     A.forEach((fa,i)=>{const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=O[i]+(fa-O[i])*bright;bp.Q.value=9;s.connect(bp);bp.connect(g(gs[i]*2.2,sum))});
     const lfo=AC.createOscillator();lfo.frequency.value=5;const lg=AC.createGain();lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(10,t+.5);lfo.connect(lg);lg.connect(s.detune);lfo.start(t);nodes.push(lfo);
     amp.gain.setValueAtTime(.0001,t);amp.gain.exponentialRampToValueAtTime(.8,t+.03);amp.gain.setTargetAtTime(.6,t+.06,.2);rel=.22}
+  else if(type==='dream'){ // dark, slow string pad that blooms open, a low octave under it, a soft tine at the start of each note, long tail
+    const fl=lp(380,.8,amp);fl.frequency.setTargetAtTime(750+bright*1300,t,.55);const mix=g(.17,fl);
+    const ch=AC.createOscillator();ch.frequency.value=.42;const cg=AC.createGain();cg.gain.value=7;ch.connect(cg);ch.start(t);nodes.push(ch);
+    [-11,0,10].forEach(d=>{const x=osc('sawtooth',f,d,mix);cg.connect(x.detune)});const sub=osc('sawtooth',f/2,4,g(.55,mix));cg.connect(sub.detune);
+    const air=osc('sine',f*2,3,g(.05,amp));cg.connect(air.detune);
+    const tg=AC.createGain();tg.connect(o);adsr(tg.gain,t,.006,.2,2.2);const car=osc('sine',f,0,tg),mg=AC.createGain();
+    mg.gain.setValueAtTime(f*1.1,t);mg.gain.exponentialRampToValueAtTime(f*.06,t+.7);mg.connect(car.frequency);osc('sine',f,0,mg);
+    amp.gain.setValueAtTime(.0001,t);amp.gain.setTargetAtTime(.55,t,.11);rel=2.6}
   let done=false;const self={dead:false};
-  const kill=r=>{if(done)return;done=true;self.dead=true;const tt=now();amp.gain.cancelScheduledValues(tt);amp.gain.setValueAtTime(Math.max(amp.gain.value,.0001),tt);amp.gain.setTargetAtTime(.0001,tt,r/3);nodes.forEach(n=>{try{n.stop(tt+r+.3)}catch(e){}})};
+  const kill=r=>{if(done)return;done=true;self.dead=true;const tt=now();amp.gain.cancelScheduledValues(tt);amp.gain.setValueAtTime(Math.max(amp.gain.value,.0001),tt);amp.gain.setTargetAtTime(.0001,tt,r/3);nodes.forEach(n=>{try{n.stop(tt+r*1.7+.3)}catch(e){}})};
   if(!sus)setTimeout(()=>kill(.05),3500);
   setTimeout(()=>kill(.4),20000); // safety: no stuck notes
   self.release=()=>kill(rel);

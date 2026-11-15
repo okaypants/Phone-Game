@@ -1,6 +1,6 @@
 # Tine
 
-A thumb-friendly, kalimba-style instrument for your phone. The kalimba is the interface, but the sounds go well past it: six acoustic-style voices (wood, dream, felt, music box, metal, glow) and six synth voices (808, Moog-style ladder bass, ARP-style lead, electro square, string machine, formant vox). It has a recorder built in.
+A thumb-friendly, kalimba-style instrument for your phone. The kalimba is the interface, but the sounds go well past it: five plucked voices (wood, felt, music box, metal, glow) and seven synth voices (dream pad, 808, Moog-style ladder bass, ARP-style lead, electro square, string machine, formant vox). It has a recorder built in.
 
 It's a single static web page with no build step, server or dependencies. All sound is synthesized live with the Web Audio API, so it uses no samples.
 
@@ -14,9 +14,9 @@ It's a single static web page with no build step, server or dependencies. All so
   - The 808, Moog, ARP and vox are mono with legato glide (off, short or long), and fall back to the note still held when you let go.
   - Electro and strings play chords.
   - Each synth has its own echo and reverb amount. The 808 and electro are dry.
-- **Dream:** a slow, dark FM electric piano with tremolo over a swelling pad and a lot of room, for moody, cinematic playing.
+- **Dream:** a dark, slow string pad that blooms open while you hold a key, with a low octave under it, a soft electric-piano tine at the start of each note and a long, reverberant tail.
 - **Glow:** a chime built only from whole-number harmonics (so it has almost no roughness), with a slow shimmer and a soft sparkle that rises up the harmonic series after each note.
-- **Click:** an optional metronome (60–160 bpm, accent every fourth beat). You hear it, but it isn't recorded. The echo time follows its tempo.
+- **Click:** an optional metronome (60–160 bpm, accent every fourth beat). You hear it and see it (the CLICK button flashes and four beat dots step along the display), but it isn't recorded. The echo time follows its tempo.
 - **Recorder:** records the instrument's own output, not the mic. Takes are kept in the browser (IndexedDB), and you can play, save or share, and delete them.
 - **App:** installable to the home screen (PWA) and works offline once loaded.
 
