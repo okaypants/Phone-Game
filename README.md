@@ -63,7 +63,7 @@ Edit in `src/`, then run `python3 src/build.py`. You can also edit `index.html` 
 - **iPhone sound:** the first tap unlocks audio. The page uses a workaround to play with the silent switch on, but if a phone stays silent, check the volume.
 - **Recordings** save as `.webm` on Android and desktop Chrome, and `.mp4` (AAC) on iPhone and Safari.
 - **Haptics** only work on Android. iOS browsers don't expose vibration.
-- **Fonts:** IBM Plex Mono loads from Google Fonts. Offline, it falls back to the system monospace font.
+- **Fonts:** IBM Plex Mono (the instrument) and Fredoka (the opening page) load from Google Fonts. Offline, they fall back to system fonts.
 - **Before a public or commercial release:** "Moog" and "ARP" are trademarks. The voice names are fine for personal use, but generic names are safer for a public launch (for example "ladder" and "lead"). "808" is widely used generically.
 
 ## Ideas for next

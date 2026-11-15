@@ -13,7 +13,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--paper:#EFECE4;--ink:#1C1C1B;--g1:#D9D6CE;--g2:#9A978F;--te:#FF6A2B}
 html,body{margin:0;height:100%;background:var(--paper);overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -62,13 +62,16 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
 .take .rm{font-size:13px}
 .take .nm{flex:1;min-width:0}.take .nm b{display:block;font-size:15px}.take .nm small{display:block;font-size:8.5px;opacity:.55;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.04em}
 .empty{font-size:11px;line-height:1.6;opacity:.6;padding:18px 6px;text-align:center}
-#start{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:var(--paper);font:500 10px 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.24em;color:var(--g2);cursor:pointer}
+#start{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,2.6vh,22px);background:var(--paper);font:500 16px Fredoka,ui-rounded,'Arial Rounded MT Bold',system-ui,sans-serif;color:var(--ink);cursor:pointer}
 #start svg{width:min(74vw,46vh);height:auto;overflow:visible}
 #start svg .tn{transform-box:fill-box;transform-origin:50% 8%;animation:twang 3.6s ease-out infinite}
 @keyframes twang{0%,100%{transform:none}3%{transform:rotate(2.2deg)}9%{transform:rotate(-1.6deg)}15%{transform:rotate(1deg)}22%{transform:rotate(-.5deg)}30%{transform:none}}
 @media (prefers-reduced-motion:reduce){#start svg .tn{animation:none}}
-#start h1{margin:0;font:600 clamp(26px,min(10.5vw,9vh),60px)/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.01em;color:var(--ink);white-space:nowrap}
-#start small{font-size:9px;letter-spacing:.14em;opacity:.7}
+#start h1{margin:0;font:inherit;font-weight:700;font-size:clamp(28px,min(11vw,10vh),64px);line-height:1;letter-spacing:.02em;white-space:nowrap}
+#start .go{font-weight:600;font-size:clamp(17px,min(5.2vw,5.5vh),24px);letter-spacing:.04em;padding:.55em 1.5em;border:2.5px solid var(--ink);border-radius:999px;background:#FBF8F1;box-shadow:4px 4px 0 var(--ink);animation:go 1.6s steps(1) infinite}
+@keyframes go{0%,100%{background:#FBF8F1}50%{background:#F2B8A2}}
+@media (prefers-reduced-motion:reduce){#start .go{animation:none}}
+#start small{font-size:clamp(14px,min(4vw,4.4vh),17px);letter-spacing:.03em;opacity:.7;margin-top:4px}
 </style>
 </head>
 <body>
@@ -87,7 +90,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
   <button class="cap wide nar" id="bTakes"><span class="lbl">TAKES</span><span class="val">0</span></button>
 </div>
 <div id="sheet"><div class="bg"></div><div class="pane"><div class="hd"><span id="shTitle"></span><button id="shDone">DONE</button></div><div class="grid" id="shGrid"></div></div></div>
-<div id="start"><svg viewBox="-4 -4 300 342" aria-hidden="true"><rect x="10" y="10" width="280" height="322" rx="50" fill="#1C1C1B"/><rect x="0" y="0" width="280" height="322" rx="50" fill="#F2B8A2" stroke="#1C1C1B" stroke-width="4"/><circle cx="140" cy="280" r="17" fill="#1C1C1B"/><rect class="tn" style="animation-delay:0.36s" x="26" y="36" width="24" height="118" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.24s" x="60" y="36" width="24" height="150" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.12s" x="94" y="36" width="24" height="180" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0s" x="128" y="36" width="24" height="208" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.18s" x="162" y="36" width="24" height="180" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.3s" x="196" y="36" width="24" height="150" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.42s" x="230" y="36" width="24" height="118" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect x="14" y="60" width="252" height="15" rx="7.5" fill="#1C1C1B"/><circle cx="24" cy="67.5" r="3" fill="#F2B8A2"/><circle cx="256" cy="67.5" r="3" fill="#F2B8A2"/></svg><h1>MEGA KALIMBA</h1><div>tap to start</div><small>thumbs · tap · slide to strum</small></div>
+<div id="start"><svg viewBox="-4 -4 300 342" aria-hidden="true"><rect x="10" y="10" width="280" height="322" rx="50" fill="#1C1C1B"/><rect x="0" y="0" width="280" height="322" rx="50" fill="#F2B8A2" stroke="#1C1C1B" stroke-width="4"/><circle cx="140" cy="280" r="17" fill="#1C1C1B"/><rect class="tn" style="animation-delay:0.36s" x="26" y="36" width="24" height="118" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.24s" x="60" y="36" width="24" height="150" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.12s" x="94" y="36" width="24" height="180" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0s" x="128" y="36" width="24" height="208" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.18s" x="162" y="36" width="24" height="180" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.3s" x="196" y="36" width="24" height="150" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect class="tn" style="animation-delay:0.42s" x="230" y="36" width="24" height="118" rx="12" fill="#FBF8F1" stroke="#1C1C1B" stroke-width="4"/><rect x="14" y="60" width="252" height="15" rx="7.5" fill="#1C1C1B"/><circle cx="24" cy="67.5" r="3" fill="#F2B8A2"/><circle cx="256" cy="67.5" r="3" fill="#F2B8A2"/></svg><h1>MEGA KALIMBA</h1><div class="go">tap to start</div><small>thumbs · tap · slide to strum</small></div>
 <script>
 const INK='#1C1C1B', PAPER='#EFECE4', G1='#D9D6CE', G2='#9A978F', CREAM='#FBF8F1', TE='#FF6A2B', BLUSH='#F59BB0';
 let TOP=78;const BPM=84, BEAT=60/BPM, PI=Math.PI, TAU=PI*2, ROOT=261.63;
