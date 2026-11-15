@@ -148,9 +148,9 @@ function keyAt(x,y){if(y<G.contentTop-6)return null;const r=clamp(Math.floor((y-
 function markPlayed(t,f){lastNote=noteName(f);lastDeg=t.idx%TUNE()[2].length+1;lastRow=t.tier+1;lastNoteT=lastPlay=performance.now();recent=Math.min(12,recent+1)}
 const isSyn=()=>SYN_TYPES.includes(SOUNDS[soundI][0]);
 // returns a handle for synth notes (so they can be released), null for kalimba plucks
-function noteOn(t,y,v,id){if(!t)return null;const f=freqOf(t.idx),type=SOUNDS[soundI][0];markPlayed(t,f);
+function noteOn(t,y,v,id){if(!t)return null;const f=freqOf(t.idx),type=SOUNDS[soundI][0];markPlayed(t,f);onset(t,v);
   if(!SYN_TYPES.includes(type)){const bright=clamp((y-t.bridgeY)/t.len,0,1)*.85+.15;kal(type,f,bright,v,pan(t.x));
-    t.amp=Math.min(10,t.amp+8*v);t.ph=0;t.flash=1;t.squish=1;ripples.push({x:t.x,y:t.bridgeY+t.len-G.tw/2,r:G.tw*.5,life:1});buzz(7);return null}
+    t.amp=Math.min(10,t.amp+8*v);t.ph=0;[-1,1].forEach(o=>{const nb=rows[t.r]&&rows[t.r][t.c+o];if(nb&&nb.amp<2){nb.amp+=1.3*v;nb.ph=o>0?PI:0}});t.flash=1;t.squish=1;ripples.push({x:t.x,y:t.bridgeY+t.len-G.tw/2,r:G.tw*.5,life:1});buzz(7);return null}
   t.hold=(t.hold||0)+1;t.flash=1;buzz(5);
   if(MONO[type]!==undefined){monoOn(id,type,f,pan(t.x));return{t,mono:true}}
   return{t,voice:synth(type,f,pan(t.x))}}
@@ -162,6 +162,35 @@ function latchNote(h,id){const v=h.mono?mono&&mono.voice:h.voice;if(!v||v.dead){
   if(h.mono)[...held.keys()].forEach(dropHeld);else dropHeld(h.t.idx);held.set(h.t.idx,{h,id})}
 function allOff(){pointers.forEach(p=>{noteOff(p.h,p.nid);p.h=null});[...held.keys()].forEach(dropHeld);if(mono){mono.voice.release();mono=null}}
 function noteOff(h,id){if(!h)return;h.t.hold=Math.max(0,(h.t.hold||0)-1);if(h.mono)monoOff(id);else h.voice&&h.voice.release()}
+
+// ───────── motes: dust that lifts off played keys. Steady playing builds `flow`, which keeps motes alive longer,
+// warms their colour, pulls them into a slow swirl and links neighbours; lose the pulse and they sink and fade ─────────
+const motes=[],CALM=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);let flow=0,lastOn=-1e9,lastIOI=0;
+function onset(t,v){const nowT=performance.now(),d=nowT-lastOn,x=t.x,y=t.bridgeY+t.len-G.tw/2;
+  if(d>90){ // notes closer than this are one strum/chord
+    let ok=false;if(lastIOI&&d<2500){const r=d/lastIOI;ok=[.5,1,2].some(k=>Math.abs(r/k-1)<.1)} // same gap as last time, or half/double it
+    if(!ok&&metOn&&AC){const half=30/metBpm,ph=((now()-metNext)%half+half)%half;ok=Math.min(ph,half-ph)<half*.14} // or on the click's grid
+    if(d<2500&&(lastIOI||metOn))flow=ok?flow+(1-flow)*.13:flow*.72;lastIOI=d<2500?d:0;lastOn=nowT}
+  if(CALM)return;
+  for(const m of motes){const dx=m.x-x,dy=m.y-y,q=Math.hypot(dx,dy)||1;if(q<150){const k=(1-q/150)*1.5*v/q;m.vx+=dx*k;m.vy+=dy*k}} // each note nudges what's nearby
+  for(let i=0,n=1+Math.round(flow*2);i<n&&motes.length<90;i++)motes.push({x:x+rnd(-6,6),y:y+rnd(-4,4),vx:rnd(-.5,.5),vy:-rnd(1.5,2.6)*(.6+v*.5),life:1,age:0,r:rnd(1.2),s:rnd(TAU)})}
+function stepMotes(dt,time){if(time-lastOn>Math.max(1200,lastIOI*2.2))flow*=Math.pow(.5,dt/150);
+  const n=motes.length;if(!n)return;let cx=0,cy=0;for(const m of motes){cx+=m.x;cy+=m.y}cx/=n;cy/=n;
+  for(let i=0;i<n;i++){const a=motes[i];for(let j=i+1;j<n;j++){const b=motes[j],dx=b.x-a.x,dy=b.y-a.y,q=dx*dx+dy*dy;
+    if(q<484&&q>.01){const d=Math.sqrt(q),k=(22-d)/22*.05*dt/d;a.vx-=dx*k;a.vy-=dy*k;b.vx+=dx*k;b.vy+=dy*k}}} // soft spacing
+  const x0=G.bx+8,x1=G.bx+G.bw-8,y0=G.contentTop,y1=G.by+G.bh-10,drag=Math.pow(.975,dt);
+  for(let i=n-1;i>=0;i--){const m=motes[i],rx=m.x-cx,ry=m.y-cy;
+    m.vx+=(Math.sin(m.y*.014+time*.0007+m.s)*.012+flow*(-ry*.0004-rx*.00012))*dt;
+    m.vy+=(Math.cos(m.x*.014+time*.0006+m.s)*.012+flow*(rx*.0004-ry*.00012)+(1-flow)*.007)*dt;
+    m.vx*=drag;m.vy*=drag;m.x+=m.vx*dt;m.y+=m.vy*dt;m.age+=dt;
+    if(m.x<x0){m.x=x0;m.vx=Math.abs(m.vx)*.5}else if(m.x>x1){m.x=x1;m.vx=-Math.abs(m.vx)*.5}
+    if(m.y<y0){m.y=y0;m.vy=Math.abs(m.vy)*.5}else if(m.y>y1){m.y=y1;m.vy=-Math.abs(m.vy)*.4}
+    m.life-=dt/(60*(1.2+flow*6));if(m.life<=0)motes.splice(i,1)}}
+function drawMotes(){const n=motes.length;if(!n)return;const col=mix(INK,TE,flow*.85),al=m=>Math.min(1,m.life*2.5)*Math.min(1,m.age/8);
+  ctx.save();ctx.strokeStyle=ctx.fillStyle=col;ctx.lineWidth=1;
+  if(flow>.35)for(let i=0;i<n;i++){const a=motes[i];for(let j=i+1;j<n;j++){const b=motes[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<52){ctx.globalAlpha=(flow-.35)*.5*(1-d/52)*al(a)*al(b);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}}}
+  for(const m of motes){ctx.globalAlpha=(.3+flow*.3)*al(m);ctx.beginPath();ctx.arc(m.x,m.y,1.3+m.r+flow*.5,0,TAU);ctx.fill()}ctx.restore()}
 
 // ───────── draw ─────────
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
@@ -203,6 +232,7 @@ function draw(time){
     ctx.fillStyle=body;[G.bx+G.pad+2,G.bx+G.bw-G.pad-2].forEach(x=>{ctx.beginPath();ctx.arc(x,y,2.2,0,TAU);ctx.fill()});ctx.restore()}
   for(let i=ripples.length-1;i>=0;i--){const r=ripples[i];r.r+=2.4;r.life-=.045;if(r.life<=0){ripples.splice(i,1);continue}
     ctx.save();ctx.globalAlpha=r.life*.4;ctx.strokeStyle=INK;ctx.lineWidth=1;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,TAU);ctx.stroke();ctx.restore()}
+  drawMotes();
   if(grainPat){ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.22;ctx.translate(-rnd(180),-rnd(180));ctx.fillStyle=grainPat;ctx.fillRect(0,0,W+180,H+180);ctx.restore()}}
 let grainPat=null;
 function buildGrain(){const g=document.createElement('canvas');g.width=g.height=180;const gx=g.getContext('2d'),id=gx.createImageData(180,180);
@@ -314,6 +344,7 @@ $('start').addEventListener('click',e=>{e.preventDefault();unlockAudio();started
 let lastT=performance.now();
 function frame(t){const dt=Math.min(3,(t-lastT)/16.667);lastT=t;recent*=Math.pow(.985,dt);
   for(const row of rows)for(const k of row){k.ph+=1.1*dt;k.amp*=Math.pow(.94,dt);k.flash=k.hold>0?1:k.flash*Math.pow(.92,dt);k.squish*=Math.pow(.85,dt)}
+  stepMotes(dt,t);
   if(metOn)$('bMet').classList.toggle('on',t-metFlash<110);
   if(rec){const v=$('bRec').querySelector('.val'),f=fmt((t-recStart)/1000);if(v.textContent!==f)v.textContent=f}
   draw(t);requestAnimationFrame(frame)}
