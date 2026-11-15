@@ -57,7 +57,7 @@ function synth(type,f,pn){if(!AC)return null;const bright=SYN_TONE[type],v=.8,t=
   let done=false;const self={dead:false};
   const kill=r=>{if(done)return;done=true;self.dead=true;const tt=now();amp.gain.cancelScheduledValues(tt);amp.gain.setValueAtTime(Math.max(amp.gain.value,.0001),tt);amp.gain.setTargetAtTime(.0001,tt,r/3);nodes.forEach(n=>{try{n.stop(tt+r*1.7+.3)}catch(e){}})};
   if(!sus)setTimeout(()=>kill(.05),3500);
-  setTimeout(()=>kill(.4),20000); // safety: no stuck notes
+  self.safety=setTimeout(()=>kill(.4),20000); // safety: no stuck notes (cancelled when HOLD latches the note)
   self.release=()=>kill(rel);
   self.glide=(fn,time)=>{if(done)return;const tt=now();for(const[x,ratio]of pitched){const fq=x.frequency;fq.cancelScheduledValues(tt);fq.setValueAtTime(fq.value,tt);fq.exponentialRampToValueAtTime(Math.max(20,fn*ratio),tt+time)}};
   return self}

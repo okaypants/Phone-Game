@@ -17,6 +17,7 @@ It's a single static web page with no build step, server or dependencies. All so
 - **Dream:** a dark, slow string pad that blooms open while you hold a key, with a low octave under it, a soft electric-piano tine at the start of each note and a long, reverberant tail.
 - **Glow:** a chime built only from whole-number harmonics (so it has almost no roughness), with a slow shimmer and a soft sparkle that rises up the harmonic series after each note.
 - **Click:** an optional metronome (60–160 bpm, accent every fourth beat). You hear it and see it (the CLICK button flashes and four beat dots step along the display), but it isn't recorded. The echo time follows its tempo.
+- **Hold:** with HOLD on, the sustaining synths (everything but the 808) keep ringing after you lift your finger. Tap a lit key again to stop it, or turn HOLD off to stop them all. Poly voices stack into chords; mono voices keep the last note.
 - **Recorder:** records the instrument's own output, not the mic. Takes are kept in the browser (IndexedDB), and you can play, save or share, and delete them.
 - **App:** installable to the home screen (PWA) and works offline once loaded.
 
@@ -66,4 +67,4 @@ Edit in `src/`, then run `python3 src/build.py`. You can also edit `index.html` 
 
 ## Ideas for next
 
-Hold/latch, an arpeggiator, a drive control, a filter you sweep by sliding along a key, MIDI out (Web MIDI on Android and desktop), a count-in for the recorder, and a Nintendo DS homebrew port (the two-row layout maps naturally onto the touchscreen).
+An arpeggiator, a drive control, a filter you sweep by sliding along a key, MIDI out (Web MIDI on Android and desktop), a count-in for the recorder, and a Nintendo DS homebrew port (the two-row layout maps naturally onto the touchscreen).

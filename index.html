@@ -41,14 +41,14 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
 .opt.sel{background:var(--ink);color:var(--paper)}
 .opt .sw{position:absolute;right:10px;top:10px;width:12px;height:12px;border-radius:50%;border:1px solid var(--ink)}
 .opt.sel .sw{border-color:var(--paper)}
-.cap.oct{grid-column:span 6;display:flex;align-items:stretch;padding:0;height:50px}
+.cap.oct{grid-column:span 5;display:flex;align-items:stretch;padding:0;height:50px}
 .cap.oct button{flex:0 0 31%;font:600 22px/1 'IBM Plex Mono',monospace;background:transparent;border:none;color:var(--ink);-webkit-tap-highlight-color:transparent}
 .cap.oct button:first-child{border-right:1.4px solid var(--ink)}.cap.oct button:last-child{border-left:1.4px solid var(--ink)}
 .cap.oct button.down{background:var(--g1)}
 .cap.oct .mid{flex:1;min-width:0;text-align:center;padding-top:8px}.cap.oct .lbl{padding-right:0;letter-spacing:.04em}.cap.oct .val{margin-top:5px}
 .cap.wide{grid-column:span 4;height:50px}.cap.wide .val{margin-top:6px}
-.cap.nar{grid-column:span 3;padding:8px 6px}
-@media (min-aspect-ratio:11/10){#panel{grid-template-columns:repeat(5,1fr) 1.6fr 1fr 1fr 1fr 1fr;max-width:1100px}.cap,.cap.oct,.cap.wide,.cap.nar{grid-column:auto;height:58px}.cap.wide .val{margin-top:9px}}
+.cap.nar{grid-column:span 3;padding:8px 6px}.cap.nar .val{font-size:12px;margin-top:8px}.cap.nar .lbl{padding-right:0}
+@media (min-aspect-ratio:11/10){#panel{grid-template-columns:repeat(5,1fr) 1.6fr 1fr 1fr 1fr 1fr 1fr;max-width:1100px}.cap.nar{padding:8px 9px}.cap.nar .val{font-size:15px;margin-top:9px}.cap,.cap.oct,.cap.wide,.cap.nar{grid-column:auto;height:58px}.cap.wide .val{margin-top:9px}}
 #bMet.on{background:var(--ink);color:var(--paper)}#bMet.on .lbl{opacity:.7}
 #bRec .val{color:#D8352A}
 #bRec.recording{background:var(--ink);color:var(--paper)}
@@ -78,9 +78,10 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
   <button class="cap" id="bScale"><span class="lbl"><span class="num">03 </span>SCALE</span><span class="val">maj</span><i class="led"></i></button>
   <button class="cap" id="bKeys"><span class="lbl"><span class="num">04 </span>ROWS</span><span class="val">2×7</span><i class="led"></i></button>
   <button class="cap on" id="bSpace"><span class="lbl"><span class="num">05 </span>SPACE</span><span class="val">on</span><i class="led"></i></button>
-  <div class="cap oct" id="oct"><button id="oDn" aria-label="octave down">−</button><span class="mid"><span class="lbl">OCTAVE</span><span class="val" id="oVal">0</span></span><button id="oUp" aria-label="octave up">+</button></div>
-  <button class="cap wide" id="bGlide"><span class="lbl">GLIDE</span><span class="val">short</span><i class="led"></i></button>
-  <button class="cap wide" id="bMet"><span class="lbl">CLICK</span><span class="val">off</span><i class="led"></i></button>
+  <div class="cap oct" id="oct"><button id="oDn" aria-label="octave down">−</button><span class="mid"><span class="lbl">OCT</span><span class="val" id="oVal">0</span></span><button id="oUp" aria-label="octave up">+</button></div>
+  <button class="cap wide nar" id="bGlide"><span class="lbl">GLIDE</span><span class="val">short</span></button>
+  <button class="cap wide nar" id="bHold"><span class="lbl">HOLD</span><span class="val">off</span><i class="led"></i></button>
+  <button class="cap wide nar" id="bMet"><span class="lbl">CLICK</span><span class="val">off</span></button>
   <button class="cap wide nar" id="bRec"><span class="lbl">REC</span><span class="val">●</span><i class="led"></i></button>
   <button class="cap wide nar" id="bTakes"><span class="lbl">TAKES</span><span class="val">0</span></button>
 </div>
@@ -276,7 +277,7 @@ function synth(type,f,pn){if(!AC)return null;const bright=SYN_TONE[type],v=.8,t=
   let done=false;const self={dead:false};
   const kill=r=>{if(done)return;done=true;self.dead=true;const tt=now();amp.gain.cancelScheduledValues(tt);amp.gain.setValueAtTime(Math.max(amp.gain.value,.0001),tt);amp.gain.setTargetAtTime(.0001,tt,r/3);nodes.forEach(n=>{try{n.stop(tt+r*1.7+.3)}catch(e){}})};
   if(!sus)setTimeout(()=>kill(.05),3500);
-  setTimeout(()=>kill(.4),20000); // safety: no stuck notes
+  self.safety=setTimeout(()=>kill(.4),20000); // safety: no stuck notes (cancelled when HOLD latches the note)
   self.release=()=>kill(rel);
   self.glide=(fn,time)=>{if(done)return;const tt=now();for(const[x,ratio]of pitched){const fq=x.frequency;fq.cancelScheduledValues(tt);fq.setValueAtTime(fq.value,tt);fq.exponentialRampToValueAtTime(Math.max(20,fn*ratio),tt+time)}};
   return self}
@@ -316,6 +317,13 @@ function noteOn(t,y,v,id){if(!t)return null;const f=freqOf(t.idx),type=SOUNDS[so
   t.hold=(t.hold||0)+1;t.flash=1;buzz(5);
   if(MONO[type]!==undefined){monoOn(id,type,f,pan(t.x));return{t,mono:true}}
   return{t,voice:synth(type,f,pan(t.x))}}
+// HOLD: sustaining synth notes keep ringing after you let go; tap a lit key again to stop it
+let latch=false,uid=0;const held=new Map();
+const canLatch=()=>isSyn()&&SOUNDS[soundI][0]!=='808';
+function dropHeld(idx){const x=held.get(idx);if(x){held.delete(idx);noteOff(x.h,x.id)}}
+function latchNote(h,id){const v=h.mono?mono&&mono.voice:h.voice;if(!v||v.dead){noteOff(h,id);return}clearTimeout(v.safety);
+  if(h.mono)[...held.keys()].forEach(dropHeld);else dropHeld(h.t.idx);held.set(h.t.idx,{h,id})}
+function allOff(){pointers.forEach(p=>{noteOff(p.h,p.nid);p.h=null});[...held.keys()].forEach(dropHeld);if(mono){mono.voice.release();mono=null}}
 function noteOff(h,id){if(!h)return;h.t.hold=Math.max(0,(h.t.hold||0)-1);if(h.mono)monoOff(id);else h.voice&&h.voice.release()}
 
 // ───────── draw ─────────
@@ -371,7 +379,7 @@ function setSwatch(){$('bSound').querySelector('.sw').style.background=SOUNDS[so
 const press=(el,fn)=>el.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();el.classList.add('down');setTimeout(()=>el.classList.remove('down'),110);fn();buzz(8);
   const led=el.querySelector('.led');if(led&&(el.id==='bKeys'||el.id==='bGlide')){el.classList.add('on');setTimeout(()=>el.classList.remove('on'),180)}});
 const preview=()=>{if(!AC)return;const row=rows[rows.length-1];[0,2,4].forEach((k,i)=>setTimeout(()=>{const t=row.find(t=>t.k===k);if(t){const id='pv'+i,h=noteOn(t,t.bridgeY+t.len*.8,.45,id);h&&setTimeout(()=>noteOff(h,id),220)}},i*90))};
-press($('bSound'),()=>openSheet('01 · SOUND',SOUNDS.map((so,i)=>({label:so[0],sub:SOUND_SUB[i],sw:so[1],sel:i===soundI,act:()=>{pointers.forEach((p,id)=>{noteOff(p.h,id);p.h=null});if(mono){mono.voice.release();mono=null}soundI=i;syncCaps()}})),120));
+press($('bSound'),()=>openSheet('01 · SOUND',SOUNDS.map((so,i)=>({label:so[0],sub:SOUND_SUB[i],sw:so[1],sel:i===soundI,act:()=>{allOff();soundI=i;syncCaps()}})),120));
 // ───────── recorder: captures the instrument's own output (no mic) ─────────
 let rec=null,recChunks=[],recStart=0,recDest=null,takes=[],playing=null,dlNS=null,tdb=null,lcdMsg='',lcdMsgT=-1e9;
 const fmt=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
@@ -411,10 +419,11 @@ function openSheet(title,opts,minW){$('shTitle').textContent=title;shGrid.style.
 sheet.querySelector('.bg').addEventListener('click',closeSheet);$('shDone').addEventListener('click',closeSheet);
 function syncCaps(){const sv=$('bSound').querySelector('.val');sv.textContent=SOUNDS[soundI][0];sv.style.fontSize=SOUNDS[soundI][0].length>5&&innerWidth<440?'11.5px':'';setSwatch();$('bRoot').querySelector('.val').textContent=ROOTS[rootI];$('bScale').querySelector('.val').textContent=SCALE_LIST[scaleI][0]}
 function setOct(d){const n=clamp(octave+d,-3,2);if(n===octave){buzz([4,30,4]);return}octave=n;$('oVal').textContent=(octave>0?'+':'')+octave;
-  pointers.forEach((p,id)=>{noteOff(p.h,id);p.h=null});if(mono){mono.voice.release();mono=null}preview()}
+  allOff();preview()}
 ['oDn','oUp'].forEach((id,i)=>{const el=$(id);el.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();el.classList.add('down');setTimeout(()=>el.classList.remove('down'),110);buzz(8);setOct(i?1:-1)})});
-press($('bRoot'),()=>openSheet('02 · KEY',ROOTS.map((r,i)=>({label:r,sub:ROOT_ALT[i],sel:i===rootI,act:()=>{rootI=i;syncCaps()}})),62));
-press($('bScale'),()=>openSheet('03 · SCALE',SCALE_LIST.map((sc,i)=>({label:sc[1],sub:stepsOf(sc[2]),sel:i===scaleI,act:()=>{scaleI=i;syncCaps()}})),140));
+press($('bRoot'),()=>openSheet('02 · KEY',ROOTS.map((r,i)=>({label:r,sub:ROOT_ALT[i],sel:i===rootI,act:()=>{allOff();rootI=i;syncCaps()}})),62));
+press($('bScale'),()=>openSheet('03 · SCALE',SCALE_LIST.map((sc,i)=>({label:sc[1],sub:stepsOf(sc[2]),sel:i===scaleI,act:()=>{allOff();scaleI=i;syncCaps()}})),140));
+press($('bHold'),()=>{latch=!latch;$('bHold').classList.toggle('on',latch);$('bHold').querySelector('.val').textContent=latch?'on':'off';if(!latch)[...held.keys()].forEach(dropHeld)});
 press($('bGlide'),()=>{glideI=(glideI+1)%GLIDES.length;$('bGlide').querySelector('.val').textContent=GLIDES[glideI][0]});
 function openTakes(){stopPlay();$('shTitle').textContent=`TAKES · ${takes.length}`;shGrid.style.gridTemplateColumns='1fr';shGrid.innerHTML='';
   if(!takes.length)shGrid.innerHTML='<div class="empty">no takes yet<br>tap REC, play, tap REC again</div>';
@@ -431,7 +440,7 @@ press($('bRec'),()=>{if(REC_MIME===null){say('rec not supported here');return}if
 press($('bTakes'),openTakes);
 if(REC_MIME===null)$('bRec').querySelector('.val').textContent='n/a';
 press($('bKeys'),()=>{const land=isLand(),list=land?OPTS.l:OPTS.p,cur=land?optL:optP;
-  openSheet('04 · ROWS',list.map(([r,n],i)=>({label:`${r}×${n}`,sub:`${r*n} keys`,sel:i===cur,act:()=>{if(land)optL=i;else optP=i;pointers.forEach((p,id)=>{noteOff(p.h,id);p.h=null;p.t=null});geo()}})),84)});
+  openSheet('04 · ROWS',list.map(([r,n],i)=>({label:`${r}×${n}`,sub:`${r*n} keys`,sel:i===cur,act:()=>{if(land)optL=i;else optP=i;allOff();pointers.forEach(p=>p.t=null);geo()}})),84)});
 // ───────── metronome: goes straight to the speakers, bypassing the chain the recorder taps ─────────
 const TEMPOS=[60,72,84,96,108,120,132,144,160];let metOn=false,metBpm=84,metNext=0,metBeat=0,metTimer=null,metGain=null,metFlash=-1e9,metShown=0;
 function metTick(){if(!AC||!metOn)return;while(metNext<now()+.12){const t=Math.max(metNext,now()),acc=metBeat%4===0,o=AC.createOscillator(),g=AC.createGain();
@@ -447,12 +456,14 @@ press($('bSpace'),()=>{space=!space;$('bSpace').classList.toggle('on',space);$('
 
 const pointers=new Map();
 cv.addEventListener('pointerdown',e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
-  const t=keyAt(e.clientX,e.clientY);pointers.set(e.pointerId,{t,h:t?noteOn(t,e.clientY,.85,e.pointerId):null})});
+  const t=keyAt(e.clientX,e.clientY),nid=++uid;
+  if(t&&held.has(t.idx)){dropHeld(t.idx);buzz(5);pointers.set(e.pointerId,{t,h:null,nid});return}
+  pointers.set(e.pointerId,{t,h:t?noteOn(t,e.clientY,.85,nid):null,nid})});
 cv.addEventListener('pointermove',e=>{const p=pointers.get(e.pointerId);if(!p)return;const t=keyAt(e.clientX,e.clientY);
-  if(t!==p.t){const id=e.pointerId;
+  if(t!==p.t){const id=p.nid;
     if(p.h&&p.h.mono&&t&&isSyn()){p.h.t.hold=Math.max(0,p.h.t.hold-1);p.h=noteOn(t,e.clientY,.6,id)} // legato glide, no retrigger
     else{noteOff(p.h,id);p.h=t?noteOn(t,e.clientY,.6,id):null}}p.t=t});
-const endP=e=>{const p=pointers.get(e.pointerId);if(p)noteOff(p.h,e.pointerId);pointers.delete(e.pointerId)};
+const endP=e=>{const p=pointers.get(e.pointerId);pointers.delete(e.pointerId);if(!p||!p.h)return;if(latch&&canLatch())latchNote(p.h,p.nid);else noteOff(p.h,p.nid)};
 cv.addEventListener('pointerup',endP);cv.addEventListener('pointercancel',endP);
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
