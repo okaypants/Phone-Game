@@ -55,6 +55,7 @@ src/                     ← editable pieces that build into index.html
   synth-voices.js        ← the six synth voices, per-instrument fx, mono/glide
   ios-audio-unlock.js    ← gets sound working on iPhones, including with the silent switch on
   build.py               ← python3 src/build.py → rebuilds index.html
+  icon.svg, icon-maskable.svg ← icon artwork the PNGs are rendered from
 ```
 
 Edit in `src/`, then run `python3 src/build.py`. You can also edit `index.html` directly if you'd rather keep it to one file.
