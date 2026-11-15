@@ -252,7 +252,7 @@ const press=(el,fn)=>el.addEventListener('pointerdown',e=>{e.stopPropagation();e
 const preview=()=>{if(!AC)return;const row=rows[rows.length-1];[0,2,4].forEach((k,i)=>setTimeout(()=>{const t=row.find(t=>t.k===k);if(t){const id='pv'+i,h=noteOn(t,t.bridgeY+t.len*.8,.45,id);h&&setTimeout(()=>noteOff(h,id),220)}},i*90))};
 press($('bSound'),()=>openSheet('01 · SOUND',SOUNDS.map((so,i)=>({label:so[0],sub:SOUND_SUB[i],sw:so[1],sel:i===soundI,act:()=>{allOff();soundI=i;syncCaps()}})),120));
 // ───────── recorder: captures the instrument's own output (no mic) ─────────
-let rec=null,recChunks=[],recStart=0,recDest=null,takes=[],playing=null,dlNS=null,tdb=null,lcdMsg='',lcdMsgT=-1e9;
+let rec=null,recChunks=[],recStart=0,recDest=null,takes=[],playing=null,tdb=null,lcdMsg='',lcdMsgT=-1e9;
 const fmt=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 const say=m=>{lcdMsg=m;lcdMsgT=performance.now()};
 const REC_MIME=(()=>{if(!window.MediaRecorder)return null;for(const m of['audio/webm;codecs=opus','audio/webm','audio/mp4;codecs=mp4a.40.2','audio/mp4'])try{if(MediaRecorder.isTypeSupported(m))return m}catch(e){}return''})();
@@ -307,7 +307,7 @@ function openTakes(){stopPlay();$('shTitle').textContent=`TAKES · ${takes.lengt
     pl.onclick=()=>togglePlay(tk,pl);
     rm.onclick=()=>{if(rm.dataset.armed){if(playing&&playing.tk===tk)stopPlay();takes=takes.filter(t=>t!==tk);delTake(tk.id);syncTakes();openTakes()}
       else{rm.dataset.armed=1;rm.textContent='del?';setTimeout(()=>{if(rm.isConnected){delete rm.dataset.armed;rm.textContent='×'}},2500)}};
-    sv.onclick=async()=>{const ext=/mp4/.test(tk.mime)?'mp4':'webm',name=`kalimbasizer ${tk.name}.${ext}`;try{if(dlNS)await dlNS.save({filename:name,data:tk.blob});else await saveLocal(name,tk.blob,tk.mime);sv.textContent='✓'}catch(e){sv.textContent=e&&(e.code==='declined'||e.name==='AbortError')?'↓':'!'}};
+    sv.onclick=async()=>{const ext=/mp4/.test(tk.mime)?'mp4':'webm',name=`kalimbasizer ${tk.name}.${ext}`;try{await saveLocal(name,tk.blob,tk.mime);sv.textContent='✓'}catch(e){sv.textContent=e&&e.name==='AbortError'?'↓':'!'}};
     shGrid.appendChild(row)});
   sheet.classList.add('open')}
 press($('bRec'),()=>{if(REC_MIME===null){say('rec not supported here');return}if(!AC)return;rec?stopRec():startRec()});
