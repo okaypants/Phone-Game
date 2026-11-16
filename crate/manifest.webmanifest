@@ -1,6 +1,6 @@
 {
-  "name": "Crate Digger",
-  "short_name": "Crate Digger",
+  "name": "The Sampler’s Compendium",
+  "short_name": "Compendium",
   "description": "Find public-domain recordings, cut short snippets and save them as WAV files for a sampler.",
   "start_url": "./",
   "scope": "./",

@@ -26,7 +26,7 @@ It's a single static web page with no build step, server or dependencies. All so
 - **Recorder:** records the instrument's own output, not the mic. Takes last until you close the app; play them back, and save or share the ones you want to keep.
 - **App:** installable to the home screen (PWA) and works offline once loaded.
 
-## Crate Digger (in `crate/`)
+## The Sampler’s Compendium (in `crate/`)
 
 A second, separate page for finding old recordings that are free to sample, cutting short snippets out of them and saving WAV files for an Akai sampler (or any other). Open `crate/index.html`, or `/crate/` once hosted.
 
@@ -62,7 +62,7 @@ Once it's hosted, phone users can use "Add to Home Screen" to get a full-screen 
 index.html               ← the whole app (this is what you deploy)
 manifest.webmanifest     ← home-screen install info
 sw.js                    ← offline cache
-crate/                   ← Crate Digger: one self-contained index.html, plus its icon and manifest
+crate/                   ← The Sampler’s Compendium: one self-contained index.html, plus its icon and manifest
 icon-*.png               ← app icons
 src/                     ← editable pieces that build into index.html
   index.template.html    ← UI, layout, input, recorder

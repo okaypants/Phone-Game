@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Crate Digger</title>
+<title>The Sampler’s Compendium</title>
 <meta name="theme-color" content="#EFECE4">
 <meta name="description" content="Find public-domain recordings, cut short snippets and save them as WAV files for an Akai sampler.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Crate Digger">
+<meta name="apple-mobile-web-app-title" content="Compendium">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -23,6 +23,7 @@ button{cursor:pointer;touch-action:manipulation}
 header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 header h1{flex:1;margin:0;font-size:17px;font-weight:600;letter-spacing:.14em}
 header h1 i{font-style:normal;color:var(--te)}
+header h1 small{display:block;font-size:9px;font-weight:500;letter-spacing:.22em;opacity:.6;margin-bottom:3px}
 .btn{border:1.4px solid var(--ink);border-radius:13px;background:var(--card);box-shadow:3px 3px 0 var(--ink);padding:0 13px;min-height:46px;font-size:12px;font-weight:600;letter-spacing:.1em;transition:transform .05s,box-shadow .05s}
 .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 .btn.on{background:var(--ink);color:var(--paper)}
@@ -77,7 +78,7 @@ button.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 </head>
 <body>
 <header>
-  <h1>CRATE<i>·</i>DIGGER</h1>
+  <h1><small>THE SAMPLER’S</small>COMPENDIUM<i>.</i></h1>
   <button class="btn sm" id="bCrate">CRATE 0</button>
   <button class="btn sm" id="bAbout" aria-label="About">?</button>
 </header>
