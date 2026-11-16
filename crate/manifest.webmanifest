@@ -1,7 +1,7 @@
 {
-  "name": "Crate Digger",
-  "short_name": "Crate Digger",
-  "description": "Find public-domain recordings, cut short snippets and save them as WAV files for a sampler.",
+  "name": "The Crates",
+  "short_name": "The Crates",
+  "description": "Listen to public-domain recordings, and sample short snippets of them for a sampler.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
