@@ -1,5 +1,4 @@
-# Kalimbasizer
-const CACHE = 'kalimbasizer-v13';
+const CACHE = 'kalimbasizer-v14';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -9,6 +8,8 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // leave other sites' files (the sample libraries' audio and search) to the browser
+  if (!e.request.url.startsWith(self.location.origin) && !e.request.url.includes('fonts.g')) return;
   e.respondWith(
     fetch(e.request).then(res => {
       const copy = res.clone();
