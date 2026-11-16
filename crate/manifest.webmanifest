@@ -1,0 +1,11 @@
+{
+  "name": "Crate Digger",
+  "short_name": "Crate Digger",
+  "description": "Find public-domain recordings, cut short snippets and save them as WAV files for a sampler.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EFECE4",
+  "theme_color": "#EFECE4",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

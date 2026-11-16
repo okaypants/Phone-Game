@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Crate Digger</title>
+<meta name="theme-color" content="#EFECE4">
+<meta name="description" content="Find public-domain recordings, cut short snippets and save them as WAV files for an Akai sampler.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Crate Digger">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#EFECE4;--ink:#1C1C1B;--g1:#D9D6CE;--g2:#9A978F;--te:#FF6A2B;--card:#F7F4EE}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+body{padding:calc(10px + env(safe-area-inset-top)) 12px calc(28px + env(safe-area-inset-bottom));max-width:660px;margin:0 auto}
+button,input{font:inherit;color:var(--ink)}
+button{cursor:pointer;touch-action:manipulation}
+[hidden]{display:none!important}
+header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+header h1{flex:1;margin:0;font-size:17px;font-weight:600;letter-spacing:.14em}
+header h1 i{font-style:normal;color:var(--te)}
+.btn{border:1.4px solid var(--ink);border-radius:13px;background:var(--card);box-shadow:3px 3px 0 var(--ink);padding:0 13px;min-height:46px;font-size:12px;font-weight:600;letter-spacing:.1em;transition:transform .05s,box-shadow .05s}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.on{background:var(--ink);color:var(--paper)}
+.btn.hot{background:var(--te)}
+.btn:disabled{opacity:.35;box-shadow:1px 1px 0 var(--ink)}
+.btn.sm{min-height:40px;padding:0 10px;font-size:11px}
+.lbl{font-size:9px;letter-spacing:.16em;opacity:.6;margin:14px 2px 7px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>.grow{flex:1;min-width:0}
+#q,#nm{border:1.4px solid var(--ink);border-radius:13px;background:#FBF8F1;min-height:46px;padding:0 12px;font-size:16px;width:100%;outline:none}
+#q:focus,#nm:focus{box-shadow:3px 3px 0 var(--te)}
+.chip{border:1.4px solid var(--ink);border-radius:999px;background:transparent;padding:0 12px;min-height:36px;font-size:11px;letter-spacing:.06em}
+.chip.on{background:var(--ink);color:var(--paper)}
+#status{font-size:11px;line-height:1.6;opacity:.7;margin:14px 2px 8px;min-height:18px}
+#status.err{opacity:1;color:#B3261E}
+.card{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1.4px solid var(--ink);border-radius:14px;background:var(--card);box-shadow:3px 3px 0 var(--ink);padding:10px 12px;margin-bottom:9px;min-height:58px}
+button.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.card .tx{flex:1;min-width:0}
+.card b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card small{display:block;font-size:10px;opacity:.6;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .yr{flex:none;font-size:12px;font-weight:600}
+.card .ic{flex:0 0 42px;height:42px;border:1.4px solid var(--ink);border-radius:11px;background:transparent;font-size:14px;font-weight:600;padding:0}
+.card .ic.on{background:var(--ink);color:var(--paper)}
+.tag{display:inline-block;border:1px solid var(--ink);border-radius:5px;padding:1px 5px;font-size:9px;letter-spacing:.08em;margin-right:6px;opacity:.85}
+#meta b{display:block;font-size:16px;font-weight:600;line-height:1.3}
+#meta small{display:block;font-size:11px;opacity:.7;margin-top:5px;line-height:1.5}
+#meta a{color:inherit}
+.wave{display:block;width:100%;border:1.4px solid var(--ink);border-radius:12px;background:#FBF8F1;touch-action:none;cursor:crosshair}
+#ov{height:64px}#dt{height:150px;margin-top:8px}
+#read{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin:8px 2px 0}
+#read span small{font-size:9px;letter-spacing:.14em;opacity:.55;font-weight:400;margin-right:5px}
+.nud{display:flex;gap:6px;align-items:center}
+.nud .btn{min-height:40px;padding:0 12px}
+.nud i{font-style:normal;font-size:9px;letter-spacing:.12em;opacity:.6;padding:0 2px}
+#prog{height:10px;border:1.4px solid var(--ink);border-radius:999px;overflow:hidden;margin:10px 0}
+#prog div{height:100%;width:0;background:var(--te)}
+#sheet{position:fixed;inset:0;z-index:4;display:none}
+#sheet.open{display:block}
+#sheet .bg{position:absolute;inset:0;background:rgba(28,28,27,.32)}
+#sheet .pane{position:absolute;left:0;right:0;bottom:0;max-width:660px;margin:0 auto;background:var(--paper);border:1.4px solid var(--ink);border-bottom:none;border-radius:22px 22px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom));max-height:86vh;overflow:auto;animation:up .16s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:.4}}
+#sheet .hd{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px;font-size:10px;letter-spacing:.16em}
+.about p{font-size:12px;line-height:1.65;margin:0 2px 12px}
+.about b{font-weight:600}
+.empty{font-size:11px;line-height:1.7;opacity:.6;padding:18px 6px;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>CRATE<i>·</i>DIGGER</h1>
+  <button class="btn sm" id="bCrate">CRATE 0</button>
+  <button class="btn sm" id="bAbout" aria-label="About">?</button>
+</header>
+
+<main id="vDig">
+  <form id="fSearch" class="row">
+    <div class="grow"><input id="q" type="search" enterkeyhint="search" placeholder="blues, banjo, a title, a name…" autocomplete="off" autocapitalize="off"></div>
+    <button class="btn hot" type="submit">DIG</button>
+  </form>
+  <div class="lbl">SOURCE</div>
+  <div class="row" id="srcs"></div>
+  <div class="lbl">QUICK DIG</div>
+  <div class="row" id="tags"></div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn grow" id="bRandom">RANDOM PAGE</button>
+    <button class="btn grow" id="bFile">OPEN MY FILE</button>
+    <input id="file" type="file" accept="audio/*" hidden>
+  </div>
+  <div id="status"></div>
+  <div id="results"></div>
+  <button class="btn" id="bMore" hidden style="width:100%">MORE</button>
+</main>
+
+<main id="vChop" hidden>
+  <div class="row" style="margin-bottom:12px"><button class="btn sm" id="bBack">← BACK TO RESULTS</button></div>
+  <div id="meta"></div>
+  <div id="loading" hidden>
+    <div id="prog"><div></div></div>
+    <div id="loadTx" style="font-size:11px;opacity:.7"></div>
+  </div>
+  <div id="tracks" style="margin-top:12px"></div>
+  <div id="editor" hidden>
+    <div class="lbl">WHOLE TRACK · TAP OR DRAG TO MOVE THE SNIPPET</div>
+    <canvas class="wave" id="ov"></canvas>
+    <div class="lbl">SNIPPET · DRAG EITHER EDGE</div>
+    <canvas class="wave" id="dt"></canvas>
+    <div id="read"><span><small>START</small><b id="rS"></b></span><span><small>LENGTH</small><b id="rL"></b></span><span><small>END</small><b id="rE"></b></span></div>
+    <div class="row" style="margin-top:10px;justify-content:space-between">
+      <div class="nud"><button class="btn" data-n="s-">◀</button><i>START</i><button class="btn" data-n="s+">▶</button></div>
+      <div class="nud"><button class="btn" data-n="e-">◀</button><i>END</i><button class="btn" data-n="e+">▶</button></div>
+    </div>
+    <div class="lbl">LENGTH</div>
+    <div class="row" id="lens"></div>
+    <div class="lbl">LISTEN</div>
+    <div class="row">
+      <button class="btn grow hot" id="bSnip">▶ SNIPPET</button>
+      <button class="btn" id="bLoop">LOOP</button>
+      <button class="btn grow" id="bTrack">▶ FROM HERE</button>
+    </div>
+    <div class="row" style="margin-top:8px"><button class="btn grow" id="bMark" disabled>MARK START AT PLAYHEAD</button></div>
+    <div class="lbl">EXPORT · 16-BIT 44.1 kHz WAV</div>
+    <div class="row">
+      <div class="grow"><input id="nm" maxlength="14" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Sample name"></div>
+      <button class="btn" id="bMono">MONO</button>
+      <button class="btn" id="bNorm">NORMALIZE</button>
+    </div>
+    <div class="lbl">CHOP INTO EQUAL SLICES</div>
+    <div class="row" id="chops"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn grow hot" id="bSave">SAVE WAV</button>
+      <button class="btn grow" id="bAdd">+ ADD TO CRATE</button>
+    </div>
+    <div id="exTx" style="font-size:11px;opacity:.7;margin:10px 2px 0;min-height:16px"></div>
+  </div>
+</main>
+
+<div id="sheet"><div class="bg"></div><div class="pane">
+  <div class="hd"><span id="shT"></span><button class="btn sm" id="shX">CLOSE</button></div>
+  <div id="shB"></div>
+</div></div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const el=(t,c,tx)=>{const e=document.createElement(t);if(c)e.className=c;if(tx!=null)e.textContent=tx;return e};
+// US sound recordings enter the public domain 100 years after publication, on the following 1 January
+const CUT=new Date().getFullYear()-101;
+const SRC={
+  ia78:{name:'78s TO '+CUT,note:'78rpm discs and cylinders digitized by libraries for the Internet Archive, published '+CUT+' or earlier'},
+  commons:{name:'WIKIMEDIA PD',note:'Wikimedia Commons files marked public domain or CC0'}
+};
+const TAGS=['blues','jazz','ragtime','piano','banjo','fiddle','orchestra','opera','choir','hawaiian','tango','march','organ','drum','whistling','yodel'];
+const LENS=[.25,.5,1,2,4,8];
+const st={src:'ia78',q:'',page:1,more:false,loop:true,mono:true,norm:true,chop:1};
+try{Object.assign(st,JSON.parse(localStorage.getItem('crate-opts')||'{}'))}catch(e){}
+if(!SRC[st.src])st.src='ia78';
+const saveOpts=()=>{try{localStorage.setItem('crate-opts',JSON.stringify({src:st.src,loop:st.loop,mono:st.mono,norm:st.norm,chop:st.chop}))}catch(e){}};
+const crate=[];
+
+/* ---------- audio ---------- */
+let AC=null,unlockEl=null;
+function silentWavURL(){const sr=8000,n=sr/2,b=new ArrayBuffer(44+n*2),v=new DataView(b);
+  const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+  return URL.createObjectURL(new Blob([b],{type:'audio/wav'}))}
+function initAudio(){
+  if(!AC){const C=window.AudioContext||window.webkitAudioContext;try{AC=new C({sampleRate:44100})}catch(e){AC=new C()}}
+  return AC}
+// iOS: play with the silent switch on, by holding a looping silent <audio> in "playback" mode
+function unlockAudio(){
+  try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+  try{if(!unlockEl){unlockEl=document.createElement('audio');unlockEl.src=silentWavURL();unlockEl.loop=true;unlockEl.setAttribute('playsinline','');unlockEl.volume=.01}
+    const pr=unlockEl.play();pr&&pr.catch(()=>{})}catch(e){}
+  try{initAudio();if(AC.state!=='running')AC.resume()}catch(e){}}
+['pointerup','touchend','click'].forEach(ev=>document.addEventListener(ev,unlockAudio,{passive:true}));
+
+/* ---------- search ---------- */
+const fmtT=s=>{s=Math.max(0,s);const m=Math.floor(s/60),r=s-m*60;return m+':'+(r<10?'0':'')+r.toFixed(2)};
+const clean=s=>String(s==null?'':Array.isArray(s)?s.join(', '):s);
+async function getJSON(url,tries=3){const r=await fetch(url);
+  if(r.status===429&&tries>1){await new Promise(ok=>setTimeout(ok,1800));return getJSON(url,tries-1)}
+  if(!r.ok)throw new Error(r.status===429?'That library is busy. Wait a moment and try again.':'The library answered with an error ('+r.status+').');return r.json()}
+function iaQuery(q){
+  // only the library digitization projects: one disc side per record, with a catalogued date. Uploads by the public are often compilations with wrong dates
+  const p=['mediatype:audio','collection:(georgeblood OR edison-recordings OR 78rpm_bostonpubliclibrary)','year:[1880 TO '+CUT+']'];
+  q=q.replace(/[^\p{L}\p{N}\s'-]/gu,' ').trim();if(q)p.push('('+q+')');
+  return p.join(' AND ')}
+function iaURL(q,rows,page){
+  const u=new URLSearchParams({q:iaQuery(q),rows,page,output:'json'});
+  ['identifier','title','creator','year'].forEach(f=>u.append('fl[]',f));u.append('sort[]','downloads desc');
+  return 'https://archive.org/advancedsearch.php?'+u}
+async function searchIA(q,page,random){
+  const rows=30;
+  if(random){const n=(await getJSON(iaURL(q,0,1))).response.numFound;page=1+Math.floor(Math.random()*Math.max(1,Math.min(Math.floor(n/rows),300)))}
+  const d=(await getJSON(iaURL(q,rows,page))).response;
+  return {page,more:d.start+d.docs.length<Math.min(d.numFound,9990),
+    items:d.docs.map(x=>({src:'ia78',id:x.identifier,title:clean(x.title)||x.identifier,artist:clean(x.creator),year:x.year||'',
+      lic:'Public domain (US)',page:'https://archive.org/details/'+encodeURIComponent(x.identifier)}))}}
+const stripHTML=h=>{const d=new DOMParser().parseFromString(h||'','text/html');return (d.body.textContent||'').replace(/\s+/g,' ').trim()};
+async function searchCommons(q,page,random){
+  const lim=50,u=new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:'filetype:audio -filemime:midi '+(q.trim()||'music'),
+    gsrnamespace:6,gsrlimit:lim,gsroffset:(page-1)*lim,prop:'imageinfo',iiprop:'url|extmetadata|size|mime',iiextmetadatafilter:'LicenseShortName|Artist|License|DateTimeOriginal'});
+  if(random)u.set('gsrsort','random');
+  const d=await getJSON('https://commons.wikimedia.org/w/api.php?'+u),pages=Object.values((d.query&&d.query.pages)||{}).sort((a,b)=>a.index-b.index),items=[];
+  for(const p of pages){const ii=p.imageinfo&&p.imageinfo[0];if(!ii)continue;const m=ii.extmetadata||{},lic=((m.License||{}).value||'').toLowerCase();
+    if(!/^(pd|cc0)/.test(lic)||/mid/.test(ii.mime||''))continue;
+    const yr=(((m.DateTimeOriginal||{}).value||'').match(/\b(1[89]|20)\d\d\b/)||[''])[0];
+    items.push({src:'commons',title:p.title.replace(/^File:/,'').replace(/\.[a-z0-9]+$/i,''),artist:stripHTML((m.Artist||{}).value).slice(0,90),year:yr,
+      lic:lic.startsWith('cc0')?'CC0':'Public domain',page:ii.descriptionurl,url:ii.url.split('?')[0],mime:ii.mime,dur:ii.duration})}
+  return {page,more:!!(d.continue&&d.continue.gsroffset),items}}
+
+let searchTok=0;
+async function runSearch(more,random){
+  const tok=++searchTok,stEl=$('status');
+  if(!more){st.page=1;$('results').textContent=''}else st.page++;
+  $('bMore').hidden=true;stEl.className='';stEl.textContent='Digging…';
+  try{
+    const r=await(st.src==='ia78'?searchIA:searchCommons)(st.q,st.page,random);
+    if(tok!==searchTok)return;
+    st.page=r.page;st.more=r.more;
+    r.items.forEach(it=>$('results').appendChild(resultCard(it)));
+    const n=$('results').children.length;
+    stEl.textContent=n?SRC[st.src].note+'.':'Nothing found. Try a broader word, or the other source.';
+    $('bMore').hidden=!r.more;
+    if(!r.items.length&&r.more&&n<1&&st.page<6)return runSearch(true)
+  }catch(e){if(tok!==searchTok)return;stEl.className='err';stEl.textContent=e instanceof TypeError?'Could not reach the library. Check your connection.':e.message}}
+function resultCard(it){
+  const c=el('button','card'),tx=el('div','tx');c.type='button';
+  tx.appendChild(el('b','',it.title));
+  const sm=el('small');sm.appendChild(el('span','tag',it.lic.toUpperCase()));sm.appendChild(document.createTextNode(it.artist||'unknown performer'));tx.appendChild(sm);
+  c.appendChild(tx);c.appendChild(el('span','yr',it.year?String(it.year):''));
+  c.onclick=()=>openItem(it);return c}
+
+/* ---------- loading a recording ---------- */
+let cur=null,loadCtl=null,sel={s:0,e:2},view={s:0,e:2};
+function showView(v){$('vDig').hidden=v!=='dig';$('vChop').hidden=v!=='chop';window.scrollTo(0,0)}
+function setMeta(it){
+  const m=$('meta');m.textContent='';m.appendChild(el('b','',it.title));
+  const sm=el('small');sm.appendChild(el('span','tag',it.lic.toUpperCase()));
+  sm.appendChild(document.createTextNode([it.artist,it.year].filter(Boolean).join(' · ')+' '));
+  if(it.page){const a=el('a','','source page ↗');a.href=it.page;a.target='_blank';a.rel='noopener';sm.appendChild(a)}
+  m.appendChild(sm)}
+async function openItem(it){
+  stopPlay();cancelLoad();cur=null;
+  showView('chop');setMeta(it);$('editor').hidden=true;$('tracks').textContent='';$('loading').hidden=true;
+  try{
+    if(it.file){return await loadAudio(it,()=>it.file.arrayBuffer())}
+    if(it.src==='commons'){
+      const direct=/mpeg|wav/.test(it.mime||''),nm=it.url.split('/').pop();
+      const mp3=it.url.replace('/commons/','/commons/transcoded/')+'/'+nm+'.mp3';
+      return await loadAudio(it,p=>direct?fetchBytes(it.url,p):fetchBytes(mp3,p).catch(e=>{if(e.name==='AbortError')throw e;return fetchBytes(it.url,p)}))}
+    loadMsg('Looking up the record…',0);
+    const ctl=loadCtl=new AbortController(),r=await fetch('https://archive.org/metadata/'+encodeURIComponent(it.id),{signal:ctl.signal});
+    const d=await r.json(),files=(d.files||[]).filter(f=>!f.private&&f.name);
+    let au=files.filter(f=>/mp3/i.test(f.format||''));
+    if(!au.length)au=files.filter(f=>/flac|wave|ogg|vorbis/i.test(f.format||''));
+    $('loading').hidden=true;
+    if(!au.length)throw new Error('This record has no playable audio file.');
+    const pick=f=>loadAudio(Object.assign({},it,{title:au.length>1&&f.title?f.title:it.title,fileName:f.name}),
+      p=>fetchBytes('https://archive.org/download/'+encodeURIComponent(it.id)+'/'+f.name.split('/').map(encodeURIComponent).join('/'),p));
+    const top=au.filter(f=>!f.name.includes('/')); // extra transfers of the same side sit in subfolders
+    if(top.length===1)return await pick(top[0]);
+    const tr=$('tracks');tr.appendChild(el('div','lbl',au.length+' RECORDINGS ON THIS RECORD · PICK ONE'));
+    au.slice(0,80).forEach(f=>{const c=el('button','card'),tx=el('div','tx');c.type='button';tx.appendChild(el('b','',f.title||f.name));
+      tx.appendChild(el('small','',f.name));c.appendChild(tx);c.appendChild(el('span','yr',lenTx(f.length)));
+      c.onclick=()=>{tr.textContent='';pick(f).catch(loadFail)};tr.appendChild(c)})
+  }catch(e){loadFail(e)}}
+const lenTx=l=>!l?'':/:/.test(l)?l:fmtT(+l).split('.')[0];
+function loadFail(e){if(e&&e.name==='AbortError')return;$('loading').hidden=false;$('prog').hidden=true;
+  $('loadTx').textContent=e instanceof TypeError?'Could not download this recording. Check your connection, or try another one.':(e&&e.message)||'Could not open this recording.'}
+function loadMsg(t,f){$('loading').hidden=false;$('prog').hidden=false;$('loadTx').textContent=t;$('prog').firstElementChild.style.width=Math.round(f*100)+'%'}
+function cancelLoad(){if(loadCtl){loadCtl.abort();loadCtl=null}}
+async function fetchBytes(url,onProg){
+  const ctl=loadCtl=new AbortController(),r=await fetch(url,{signal:ctl.signal});
+  if(!r.ok)throw new Error('Could not download this recording ('+r.status+').');
+  const total=+r.headers.get('content-length')||0;
+  if(!r.body||!r.body.getReader)return r.arrayBuffer();
+  const rd=r.body.getReader(),chunks=[];let n=0;
+  for(;;){const {done,value}=await rd.read();if(done)break;chunks.push(value);n+=value.length;onProg(total?n/total:0,n)}
+  const out=new Uint8Array(n);let o=0;for(const c of chunks){out.set(c,o);o+=c.length}
+  return out.buffer}
+async function loadAudio(it,getBytes){
+  setMeta(it);loadMsg('Downloading…',0);
+  const bytes=await getBytes((f,n)=>loadMsg('Downloading… '+(n/1048576).toFixed(1)+' MB',f));
+  loadMsg('Decoding…',1);
+  initAudio();
+  let buf;
+  try{buf=await new Promise((ok,no)=>{const p=AC.decodeAudioData(bytes,ok,no);if(p&&p.catch)p.catch(no)})}
+  catch(e){throw new Error('This browser cannot decode that audio format. Try another recording.')}
+  cur=Object.assign({},it,{buf,dur:buf.duration,peaks:makePeaks(buf,1400)});
+  $('loading').hidden=true;$('editor').hidden=false;
+  $('nm').value=akaiName(it.title);
+  const len=Math.min(2,cur.dur),s=Math.min(Math.max(0,cur.dur*.25),cur.dur-len);
+  setSel(s,s+len,true);updateExportTx()}
+function makePeaks(buf,n){
+  const a=buf.getChannelData(0),b=buf.numberOfChannels>1?buf.getChannelData(1):null,pk=new Float32Array(n),per=a.length/n,step=Math.max(1,Math.floor(per/400));
+  for(let i=0;i<n;i++){let m=0;const i0=Math.floor(i*per),i1=Math.min(a.length,Math.floor((i+1)*per));
+    for(let j=i0;j<i1;j+=step){let v=a[j];if(v<0)v=-v;if(v>m)m=v;if(b){v=b[j];if(v<0)v=-v;if(v>m)m=v}}pk[i]=m}
+  return pk}
+const akaiName=t=>(String(t).normalize('NFD').replace(/[^\x20-\x7e]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,'').slice(0,12))||'SAMPLE';
+
+/* ---------- selection + drawing ---------- */
+const MINLEN=.02;
+function setSel(s,e,refit){
+  if(!cur)return;
+  s=Math.max(0,Math.min(s,cur.dur-MINLEN));e=Math.max(s+MINLEN,Math.min(e,cur.dur));
+  sel={s,e};if(refit)fitView();
+  $('rS').textContent=fmtT(s);$('rE').textContent=fmtT(e);$('rL').textContent=(e-s).toFixed(e-s<1?3:2)+' s';
+  document.querySelectorAll('#lens .chip').forEach(c=>c.classList.toggle('on',Math.abs(+c.dataset.l-(e-s))<.0005));
+  draw();updateExportTx()}
+function fitView(){const len=sel.e-sel.s,pad=Math.max(.05,len*.3);view={s:Math.max(0,sel.s-pad),e:Math.min(cur.dur,sel.e+pad)}}
+function sizeCanvas(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1,w=Math.round(r.width*d),h=Math.round(r.height*d);
+  if(c.width!==w||c.height!==h){c.width=w;c.height=h}return c.getContext('2d')}
+let drawQ=false;
+function draw(){if(drawQ)return;drawQ=true;requestAnimationFrame(()=>{drawQ=false;if(cur&&!$('editor').hidden){drawOv();drawDt()}})}
+const INK='#1C1C1B',TE='#FF6A2B';
+function drawOv(){
+  const c=$('ov'),g=sizeCanvas(c),W=c.width,H=c.height,pk=cur.peaks,n=pk.length;
+  g.clearRect(0,0,W,H);
+  const x0=sel.s/cur.dur*W,x1=sel.e/cur.dur*W;
+  g.fillStyle='rgba(255,106,43,.35)';g.fillRect(x0,0,Math.max(2,x1-x0),H);
+  g.fillStyle=INK;
+  for(let x=0;x<W;x++){const v=pk[Math.min(n-1,Math.floor(x/W*n))],h=Math.max(1,v*H*.92);g.fillRect(x,(H-h)/2,1,h)}
+  g.fillStyle=TE;g.fillRect(x0-1,0,2,H);g.fillRect(x1-1,0,2,H);
+  const ph=playPos();if(ph!=null){g.fillStyle=INK;g.fillRect(ph/cur.dur*W-1,0,3,H)}}
+function drawDt(){
+  const c=$('dt'),g=sizeCanvas(c),W=c.width,H=c.height,buf=cur.buf,a=buf.getChannelData(0),sr=buf.sampleRate,d=window.devicePixelRatio||1;
+  g.clearRect(0,0,W,H);
+  const tx=t=>(t-view.s)/(view.e-view.s)*W,x0=tx(sel.s),x1=tx(sel.e);
+  g.fillStyle='rgba(255,106,43,.22)';g.fillRect(x0,0,x1-x0,H);
+  const spp=(view.e-view.s)*sr/W,step=Math.max(1,Math.floor(spp/300));
+  g.fillStyle=INK;
+  for(let x=0;x<W;x++){const i0=Math.floor(view.s*sr+x*spp),i1=Math.min(a.length,Math.max(i0+1,Math.floor(view.s*sr+(x+1)*spp)));let lo=1,hi=-1;
+    for(let j=i0;j<i1;j+=step){const v=a[j];if(v<lo)lo=v;if(v>hi)hi=v}
+    if(lo>hi)continue;const y0=(1-hi)*H/2,y1=(1-lo)*H/2;g.fillRect(x,y0,1,Math.max(1,y1-y0))}
+  g.fillStyle=TE;
+  [[x0,1],[x1,-1]].forEach(([x,dir])=>{g.fillRect(x-1.5*d,0,3*d,H);g.fillRect(dir>0?x:x-12*d,0,12*d,16*d);g.fillRect(dir>0?x:x-12*d,H-16*d,12*d,16*d)});
+  const ph=playPos();if(ph!=null&&ph>=view.s&&ph<=view.e){g.fillStyle=INK;g.fillRect(tx(ph)-d,0,2*d,H)}}
+
+function dragOn(c,fn,done){
+  let id=null;const at=ev=>{const r=c.getBoundingClientRect();return Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width))};
+  c.addEventListener('pointerdown',ev=>{if(!cur)return;id=ev.pointerId;try{c.setPointerCapture(id)}catch(e){}fn(at(ev),true);ev.preventDefault()});
+  c.addEventListener('pointermove',ev=>{if(ev.pointerId===id)fn(at(ev),false)});
+  const up=ev=>{if(ev.pointerId===id){id=null;done&&done()}};
+  c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up)}
+dragOn($('ov'),f=>{const len=sel.e-sel.s,s=Math.max(0,Math.min(f*cur.dur-len/2,cur.dur-len));setSel(s,s+len,true)},()=>replay());
+let grab='s';
+dragOn($('dt'),(f,first)=>{const t=view.s+f*(view.e-view.s);
+  if(first)grab=Math.abs(t-sel.s)<=Math.abs(t-sel.e)?'s':'e';
+  if(grab==='s')setSel(Math.min(t,sel.e-MINLEN),sel.e);else setSel(sel.s,Math.max(t,sel.s+MINLEN))},()=>{fitView();draw();replay()});
+window.addEventListener('resize',draw);
+
+/* ---------- playback ---------- */
+let play=null;
+function stopPlay(){if(play){const p=play;play=null;try{p.node.onended=null;p.node.stop()}catch(e){}}syncPlayUI()}
+function startPlay(mode){
+  if(!cur)return;stopPlay();unlockAudio();
+  const node=AC.createBufferSource();node.buffer=cur.buf;node.connect(AC.destination);
+  const p={node,mode,t0:AC.currentTime+.02,s:sel.s,e:sel.e,loop:mode==='snip'&&st.loop};
+  if(p.loop){node.loop=true;node.loopStart=p.s;node.loopEnd=p.e;node.start(p.t0,p.s)}
+  else if(mode==='snip')node.start(p.t0,p.s,p.e-p.s);
+  else node.start(p.t0,p.s);
+  node.onended=()=>{if(play===p){play=null;syncPlayUI();draw()}};
+  play=p;syncPlayUI();tick()}
+function playPos(){
+  if(!play||!cur)return null;const t=Math.max(0,AC.currentTime-play.t0);
+  if(play.loop)return play.s+t%(play.e-play.s);
+  return Math.min(play.s+t,play.mode==='snip'?play.e:cur.dur)}
+function tick(){if(!play)return;drawQ=false;draw();requestAnimationFrame(tick)}
+function replay(){if(play)startPlay(play.mode)}
+function syncPlayUI(){
+  const m=play&&play.mode;
+  $('bSnip').textContent=m==='snip'?'■ STOP':'▶ SNIPPET';$('bTrack').textContent=m==='track'?'■ STOP':'▶ FROM HERE';
+  $('bSnip').classList.toggle('on',m==='snip');$('bTrack').classList.toggle('on',m==='track');$('bMark').disabled=m!=='track'}
+$('bSnip').onclick=()=>play&&play.mode==='snip'?stopPlay():startPlay('snip');
+$('bTrack').onclick=()=>play&&play.mode==='track'?stopPlay():startPlay('track');
+$('bMark').onclick=()=>{const t=playPos();if(t==null)return;const len=sel.e-sel.s,s=Math.min(t,cur.dur-len);setSel(s,s+len,true)};
+$('bLoop').onclick=()=>{st.loop=!st.loop;saveOpts();syncOpts();if(play&&play.mode==='snip')startPlay('snip')};
+
+/* ---------- export ---------- */
+function renderSel(s,e,gain){
+  const buf=cur.buf,sr=buf.sampleRate,i0=Math.round(s*sr),n=Math.max(1,Math.round(e*sr)-i0),nc=buf.numberOfChannels,chs=st.mono||nc===1?1:2,out=[];
+  for(let c=0;c<chs;c++){const o=new Float32Array(n);
+    if(chs===1){for(let k=0;k<nc;k++){const a=buf.getChannelData(k);for(let i=0;i<n;i++)o[i]+=(a[i0+i]||0)/nc}}
+    else{const a=buf.getChannelData(c);for(let i=0;i<n;i++)o[i]=a[i0+i]||0}
+    const f=Math.min(Math.round(sr*.002),n>>2);
+    for(let i=0;i<n;i++)o[i]*=gain;
+    for(let i=0;i<f;i++){const g=i/f;o[i]*=g;o[n-1-i]*=g}
+    out.push(o)}
+  return {sr,chs,n,out}}
+function peakGain(s,e){
+  if(!st.norm)return 1;const r=renderSel(s,e,1);let m=0;
+  for(const o of r.out)for(let i=0;i<o.length;i++){const v=o[i]<0?-o[i]:o[i];if(v>m)m=v}
+  return m>1e-4?.97/m:1}
+async function toWav(r){
+  let {sr,chs,n,out}=r;
+  if(sr!==44100){ // only when the browser refused a 44.1 kHz context
+    const oc=new OfflineAudioContext(chs,Math.ceil(n*44100/sr),44100),b=oc.createBuffer(chs,n,sr);out.forEach((o,c)=>b.getChannelData(c).set(o));
+    const sn=oc.createBufferSource();sn.buffer=b;sn.connect(oc.destination);sn.start();const rb=await oc.startRendering();
+    out=[];for(let c=0;c<chs;c++)out.push(rb.getChannelData(c));n=rb.length;sr=44100}
+  const ab=new ArrayBuffer(44+n*chs*2),v=new DataView(ab),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  w(0,'RIFF');v.setUint32(4,36+n*chs*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,chs,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*chs*2,true);v.setUint16(32,chs*2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*chs*2,true);
+  let o=44;for(let i=0;i<n;i++)for(let c=0;c<chs;c++){let x=out[c][i];x=x>1?1:x<-1?-1:x;v.setInt16(o,Math.round(x*32767),true);o+=2}
+  return new Uint8Array(ab)}
+const baseName=()=>($('nm').value.toUpperCase().replace(/[^A-Z0-9_-]+/g,'').slice(0,14))||'SAMPLE';
+const creditOf=(name,s,e)=>name+'.WAV — "'+cur.title+'"'+(cur.artist?', '+cur.artist:'')+(cur.year?' ('+cur.year+')':'')+' — '+fmtT(s)+' to '+fmtT(e)+' — '+cur.lic+(cur.page?' — '+cur.page:'');
+async function makeSlices(){
+  const n=st.chop,g=peakGain(sel.s,sel.e),base=baseName(),len=(sel.e-sel.s)/n,res=[];
+  for(let i=0;i<n;i++){const s=sel.s+i*len,e=s+len,name=n>1?base+String(i+1).padStart(2,'0'):base;
+    res.push({name,bytes:await toWav(renderSel(s,e,g)),dur:len,credit:creditOf(name,s,e)})}
+  return res}
+function updateExportTx(){
+  if(!cur)return;const chs=st.mono||cur.buf.numberOfChannels===1?1:2,len=sel.e-sel.s,kb=len*44100*2*chs/1024;
+  $('exTx').textContent=(st.chop>1?st.chop+' slices of '+(len/st.chop).toFixed(3)+' s · ':'')+(chs===1?'mono':'stereo')+' · '+(kb<1000?Math.round(kb)+' KB':(kb/1024).toFixed(1)+' MB')+(st.chop>1?' in total':'')}
+async function saveBlob(blob,name){
+  if(navigator.standalone&&navigator.canShare){const f=new File([blob],name,{type:blob.type});
+    if(navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:name})}catch(e){}return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000)}
+const wavBlob=b=>new Blob([b],{type:'audio/wav'});
+$('bSave').onclick=async()=>{
+  if(!cur)return;const sl=await makeSlices();
+  if(sl.length===1)return saveBlob(wavBlob(sl[0].bytes),sl[0].name+'.WAV');
+  saveBlob(zip(sl.map(s=>({name:s.name+'.WAV',bytes:s.bytes})).concat(creditsFile(sl))),baseName()+'.zip')};
+$('bAdd').onclick=async()=>{
+  if(!cur)return;const sl=await makeSlices();sl.forEach(s=>crate.push(s));syncCrate();
+  $('exTx').textContent='Added '+(sl.length>1?sl.length+' slices':sl[0].name+'.WAV')+' to the crate.'};
+const creditsFile=items=>({name:'CREDITS.TXT',bytes:new TextEncoder().encode('Sources for these samples\r\n\r\n'+items.map(i=>i.credit).join('\r\n')+'\r\n')});
+
+/* ---------- zip (stored, no compression) ---------- */
+const CRC=(()=>{const t=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[i]=c}return t})();
+function crc32(b){let c=-1;for(let i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return (c^-1)>>>0}
+function zip(files){
+  const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  const used={};
+  for(const f of files){
+    let nm=f.name;if(used[nm]){const i=nm.lastIndexOf('.');nm=nm.slice(0,i)+'-'+(++used[nm])+nm.slice(i)}else used[nm]=1;
+    const name=enc.encode(nm),crc=crc32(f.bytes),sz=f.bytes.length;
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(8,0,true);h.setUint32(10,0x00210000,true);
+    h.setUint32(14,crc,true);h.setUint32(18,sz,true);h.setUint32(22,sz,true);h.setUint16(26,name.length,true);
+    parts.push(new Uint8Array(h.buffer),name,f.bytes);
+    const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint32(12,0x00210000,true);
+    c.setUint32(16,crc,true);c.setUint32(20,sz,true);c.setUint32(24,sz,true);c.setUint16(28,name.length,true);c.setUint32(42,off,true);
+    cen.push(new Uint8Array(c.buffer),name);off+=30+name.length+sz}
+  const cs=cen.reduce((a,b)=>a+b.length,0),e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob(parts.concat(cen,[new Uint8Array(e.buffer)]),{type:'application/zip'})}
+
+/* ---------- crate + about sheets ---------- */
+let prevEl=null;
+function stopPrev(){if(prevEl){prevEl.pause();URL.revokeObjectURL(prevEl.src);prevEl=null}}
+function openSheet(title,body){$('shT').textContent=title;$('shB').textContent='';$('shB').appendChild(body);$('sheet').classList.add('open')}
+function closeSheet(){stopPrev();$('sheet').classList.remove('open')}
+$('shX').onclick=closeSheet;$('sheet').querySelector('.bg').onclick=closeSheet;
+function syncCrate(){$('bCrate').textContent='CRATE '+crate.length;if($('sheet').classList.contains('open')&&$('shT').textContent.startsWith('CRATE'))showCrate()}
+function showCrate(){
+  stopPrev();const b=el('div');
+  if(!crate.length)b.appendChild(el('div','empty','The crate is empty. Cut a snippet and tap + ADD TO CRATE. It holds your snippets until you close the app, so save the ones you want to keep.'));
+  crate.forEach((it,i)=>{
+    const c=el('div','card'),pl=el('button','ic','▶'),tx=el('div','tx'),sv=el('button','ic','↓'),rm=el('button','ic','✕');
+    tx.appendChild(el('b','',it.name+'.WAV'));tx.appendChild(el('small','',it.dur.toFixed(it.dur<1?3:2)+' s · '+Math.round(it.bytes.length/1024)+' KB'));
+    pl.onclick=()=>{const was=pl.classList.contains('on');stopPrev();b.querySelectorAll('.ic.on').forEach(x=>{x.classList.remove('on');x.textContent='▶'});if(was)return;
+      prevEl=new Audio(URL.createObjectURL(wavBlob(it.bytes)));prevEl.onended=()=>{pl.classList.remove('on');pl.textContent='▶'};prevEl.play();pl.classList.add('on');pl.textContent='■'};
+    sv.onclick=()=>saveBlob(wavBlob(it.bytes),it.name+'.WAV');sv.setAttribute('aria-label','Save');
+    rm.onclick=()=>{crate.splice(i,1);syncCrate()};rm.setAttribute('aria-label','Remove');
+    c.appendChild(pl);c.appendChild(tx);c.appendChild(sv);c.appendChild(rm);b.appendChild(c)});
+  if(crate.length){const all=el('button','btn hot','SAVE ALL AS .ZIP');all.style.width='100%';all.style.marginTop='6px';
+    all.onclick=()=>saveBlob(zip(crate.map(s=>({name:s.name+'.WAV',bytes:s.bytes})).concat(creditsFile(crate))),'CRATE.zip');b.appendChild(all)}
+  openSheet('CRATE · '+crate.length+(crate.length===1?' SNIPPET':' SNIPPETS'),b)}
+$('bCrate').onclick=showCrate;
+$('bAbout').onclick=()=>{const b=el('div','about');b.innerHTML=
+  '<p><b>What this is.</b> A way to find old recordings that are free to use, cut a short piece out of one, and save it as a WAV file your sampler can load.</p>'+
+  '<p><b>Getting it onto an Akai.</b> Files are 16-bit, 44.1 kHz WAV, which every MPC and S-series sampler reads. Copy them to the SD card, CF card or USB drive your sampler uses. Names are kept to 16 characters, capitals and digits, for older machines. Or do it the old way: run a cable from the headphone jack into the sampler\'s input, turn LOOP off, and record while the snippet plays.</p>'+
+  '<p><b>78s to '+CUT+'.</b> In the United States, sound recordings published in '+CUT+' or earlier are in the public domain, and one more year joins them each 1 January. These results are discs and cylinders that libraries digitized for the Internet Archive (the Great 78 Project, the Edison collection and Boston Public Library), filtered by the catalogued date. A date is occasionally wrong, so check the source page before a release.</p>'+
+  '<p><b>Wikimedia PD.</b> Files on Wikimedia Commons that are marked public domain or CC0. Each one links to its page, which says why it is free.</p>'+
+  '<p><b>Outside the US</b> the rules differ, and many countries protect recordings for 70 years or more after release.</p>'+
+  '<p><b>About fair use.</b> A short sample of a copyrighted song is not automatically fair use; there is no safe number of seconds. That is why this app only searches public-domain sources. OPEN MY FILE loads any audio you already have, and what you may do with that is up to you.</p>'+
+  '<p><b>Credits.</b> Every zip includes a CREDITS.TXT listing the recording, the timing and the source page for each snippet.</p>';
+  openSheet('ABOUT',b)};
+
+/* ---------- controls ---------- */
+function chips(host,list,label,isOn,pick){host.textContent='';list.forEach(v=>{const c=el('button','chip',label(v));c.type='button';c.classList.toggle('on',isOn(v));c.onclick=()=>pick(v);host.appendChild(c)})}
+function syncOpts(){
+  chips($('srcs'),Object.keys(SRC),k=>SRC[k].name,k=>k===st.src,k=>{st.src=k;saveOpts();syncOpts();runSearch()});
+  chips($('tags'),TAGS,t=>t,t=>t===st.q,t=>{st.q=t;$('q').value=t;syncOpts();runSearch()});
+  chips($('chops'),[1,2,4,8,16],n=>n===1?'OFF':'×'+n,n=>n===st.chop,n=>{st.chop=n;saveOpts();syncOpts();updateExportTx()});
+  $('bLoop').classList.toggle('on',st.loop);$('bMono').classList.toggle('on',st.mono);$('bNorm').classList.toggle('on',st.norm)}
+LENS.forEach(l=>{const c=el('button','chip',l<1?l*1000+' ms':l+' s');c.type='button';c.dataset.l=l;
+  c.onclick=()=>{if(!cur)return;const len=Math.min(l,cur.dur),s=Math.min(sel.s,cur.dur-len);setSel(s,s+len,true);replay()};$('lens').appendChild(c)});
+document.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{const k=b.dataset.n,d=(k[1]==='+'?1:-1)*.01;
+  if(k[0]==='s')setSel(Math.max(0,Math.min(sel.s+d,sel.e-MINLEN)),sel.e,true);else setSel(sel.s,Math.max(sel.s+MINLEN,sel.e+d),true);replay()});
+$('bMono').onclick=()=>{st.mono=!st.mono;saveOpts();syncOpts();updateExportTx()};
+$('bNorm').onclick=()=>{st.norm=!st.norm;saveOpts();syncOpts()};
+$('fSearch').onsubmit=ev=>{ev.preventDefault();st.q=$('q').value.trim();$('q').blur();syncOpts();runSearch()};
+$('bMore').onclick=()=>runSearch(true);
+$('bRandom').onclick=()=>runSearch(false,true);
+$('bBack').onclick=()=>{stopPlay();cancelLoad();showView('dig')};
+$('bFile').onclick=()=>$('file').click();
+$('file').onchange=()=>{const f=$('file').files[0];$('file').value='';if(!f)return;
+  openItem({src:'file',file:f,title:f.name.replace(/\.[a-z0-9]+$/i,''),artist:'',year:'',lic:'Your own file',page:''})};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopPlay()});
+syncOpts();
+$('status').textContent='Pick a word, or tap RANDOM PAGE. Everything here is public domain; tap ? for what that means.';
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('../sw.js').catch(()=>{});
+</script>
+</body>
+</html>
