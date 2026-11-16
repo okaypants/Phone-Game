@@ -28,16 +28,15 @@ It's a single static web page with no build step, server or dependencies. All so
 
 ## The Crates (in `crate/`)
 
-A second, separate page over shelves of old recordings that are free to use. It has two halves, switched at the top: LISTEN, a plain player, and SAMPLE, for grabbing short snippets as WAV files for an Akai sampler (or any other). Open `crate/index.html`, or `/crate/` once hosted; `/crate/#listen` and `/crate/#sample` open either half directly.
+A second, separate page: a player and sampler over shelves of old recordings that are free to use. Listen to them back to back, and grab short snippets as WAV files for an Akai sampler (or any other). Open `crate/index.html`, or `/crate/` once hosted.
 
 - **Sources:** 78rpm discs and cylinders that libraries digitized for the Internet Archive, limited to recordings old enough to be public domain in the US (published 101 or more years ago; the cutoff year moves on by itself each January), and Wikimedia Commons audio marked public domain or CC0. OPEN MY FILE plays audio you already have.
 - **Dig:** search by word, tap a quick-dig tag, or pull a random page.
-- **Listen:** tap a record and it plays in a player at the bottom of the screen; when it ends, the next one starts. ⏮ and ⏭ change record, the bar seeks, and lock-screen controls work.
-- **Skim (both halves):** plays a few seconds, hops ahead, and moves on to the next record, for scanning a pile of records hands-free.
+- **Listen:** tap a record and it plays in a player at the bottom of the screen; when it ends, the next one starts. ⏮ and ⏭ change record, tapping the bar jumps anywhere in it, and lock-screen controls work.
 - **Sample:** hold HOLD TO SAMPLE while the part you want plays and let go when it ends (or tap once to start and again to finish). Only that part is captured. The sample loops so you can hear it; SAVE WAV keeps it, and + KEEP sets it aside to save as a batch.
 - **Fine-tune (optional):** drag the sample's edges in a close-up (there is about a second of extra audio either side) or nudge them by 10 ms.
 - **Export:** 16-bit 44.1 kHz WAV, mono or stereo, optionally normalized, with 2 ms fades so slices don't click. Names are capitals and digits, 16 characters at most, for older samplers. CHOP splits a sample into 2, 4, 8 or 16 equal slices, saved as a zip. Every zip includes a `CREDITS.TXT` with the recording, timing and source page of each snippet.
-- **Light on the phone:** records are streamed, never downloaded whole, and nothing is stored beyond your settings. Moving to another record forgets the last one, and a sample closed without saving or keeping is forgotten too, so nothing piles up. LISTEN uses the browser's plain audio player; the recording engine only starts in SAMPLE. Search answers are remembered for the session so going back costs no request. Kept snippets live in memory until the app closes.
+- **Light on the phone:** records are streamed, never downloaded whole, and nothing is stored beyond your settings. Moving to another record forgets the last one, and a sample closed without saving or keeping is forgotten too, so nothing piles up. Search answers are remembered for the session so going back costs no request. Kept snippets live in memory until the app closes.
 - **Not included on purpose:** copyrighted music. A short sample is not automatically fair use, so the app only searches public-domain sources.
 
 ## Run it locally

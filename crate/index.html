@@ -23,13 +23,6 @@ button{cursor:pointer;touch-action:manipulation}
 header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 header h1{flex:1;margin:0;font-size:17px;font-weight:600;letter-spacing:.14em}
 header h1 i{font-style:normal;color:var(--te)}
-.seg{display:flex;border:1.4px solid var(--ink);border-radius:14px;overflow:hidden;margin-bottom:12px;box-shadow:3px 3px 0 var(--ink)}
-.seg button{flex:1;border:none;background:var(--card);padding:9px 6px;min-height:52px}
-.seg button+button{border-left:1.4px solid var(--ink)}
-.seg b{display:block;font-size:13px;letter-spacing:.14em}
-.seg small{display:block;font-size:9px;opacity:.65;margin-top:3px}
-.seg button.on{background:var(--ink);color:var(--paper)}
-body.m-listen .sampOnly{display:none!important}
 .btn{border:1.4px solid var(--ink);border-radius:13px;background:var(--card);box-shadow:3px 3px 0 var(--ink);padding:0 13px;min-height:46px;font-size:12px;font-weight:600;letter-spacing:.1em;transition:transform .05s,box-shadow .05s}
 .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 .btn.on{background:var(--ink);color:var(--paper)}
@@ -69,7 +62,7 @@ button.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 @keyframes up{from{transform:translateY(30px);opacity:.4}}
 .sheet .hd{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px;font-size:10px;letter-spacing:.16em}
 #dock{position:fixed;left:0;right:0;bottom:0;z-index:3;max-width:660px;margin:0 auto;background:var(--paper);border:1.4px solid var(--ink);border-bottom:none;border-radius:20px 20px 0 0;padding:10px 12px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(28,28,27,.12)}
-body.docked{padding-bottom:calc(270px + env(safe-area-inset-bottom))}
+body.docked{padding-bottom:calc(210px + env(safe-area-inset-bottom))}
 .dk1{display:flex;align-items:center;gap:10px}
 .dk1 .tx{flex:1;min-width:0}
 .dk1 b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -93,12 +86,11 @@ body.docked{padding-bottom:calc(270px + env(safe-area-inset-bottom))}
 <body>
 <header>
   <h1>THE CRATES<i>.</i></h1>
-  <button class="btn sm sampOnly" id="bCrate">KEPT 0</button>
+  <button class="btn sm" id="bCrate">KEPT 0</button>
   <button class="btn sm" id="bAbout" aria-label="About">?</button>
 </header>
 
 <main>
-  <div class="seg" id="modes"><button type="button" data-m="listen"><b>LISTEN</b><small>play records back to back</small></button><button type="button" data-m="sample"><b>SAMPLE</b><small>grab snippets for a sampler</small></button></div>
   <form id="fSearch" class="row">
     <div class="grow"><input id="q" type="search" enterkeyhint="search" placeholder="blues, banjo, a title, a name…" autocomplete="off" autocapitalize="off"></div>
     <button class="btn hot" type="submit">DIG</button>
@@ -124,11 +116,6 @@ body.docked{padding-bottom:calc(270px + env(safe-area-inset-bottom))}
     <button class="btn" id="bPrev" aria-label="Previous record">⏮</button>
     <button class="btn" id="bPlay" aria-label="Play or pause">▶</button>
     <button class="btn" id="bNext" aria-label="Next record">⏭</button>
-    <button class="btn grow" id="bSkim">SKIM</button>
-  </div>
-  <div class="row sampOnly" style="margin-top:8px">
-    <button class="btn" id="bBack5" aria-label="Back 5 seconds">−5</button>
-    <button class="btn" id="bFwd5" aria-label="Forward 5 seconds">+5</button>
     <button id="bSamp" class="grow">HOLD TO SAMPLE</button>
   </div>
 </div>
@@ -183,12 +170,10 @@ const SRC={
   commons:{name:'WIKIMEDIA PD',note:'Wikimedia Commons files marked public domain or CC0'}
 };
 const TAGS=['blues','jazz','ragtime','piano','banjo','fiddle','orchestra','opera','choir','hawaiian','tango','march','organ','drum','whistling','yodel'];
-const st={mode:'listen',src:'ia78',q:'',page:1,more:false,loop:true,mono:true,norm:true,chop:1};
+const st={src:'ia78',q:'',page:1,more:false,loop:true,mono:true,norm:true,chop:1};
 try{Object.assign(st,JSON.parse(localStorage.getItem('crate-opts')||'{}'))}catch(e){}
 if(!SRC[st.src])st.src='ia78';
-if(/^#(listen|sample)$/.test(location.hash))st.mode=location.hash.slice(1); // bookmark either half
-if(st.mode!=='sample')st.mode='listen';
-const saveOpts=()=>{try{localStorage.setItem('crate-opts',JSON.stringify({mode:st.mode,src:st.src,loop:st.loop,mono:st.mono,norm:st.norm,chop:st.chop}))}catch(e){}};
+const saveOpts=()=>{try{localStorage.setItem('crate-opts',JSON.stringify({src:st.src,loop:st.loop,mono:st.mono,norm:st.norm,chop:st.chop}))}catch(e){}};
 const crate=[];
 
 /* ---------- audio ---------- */
@@ -204,7 +189,6 @@ function initAudio(){
   return AC}
 // iOS: play with the silent switch on, by holding a looping silent <audio> in "playback" mode
 function unlockAudio(){
-  if(st.mode!=='sample'&&!graph)return; // LISTEN is a plain player and needs no audio engine
   try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
   try{if(!unlockEl){unlockEl=document.createElement('audio');unlockEl.src=silentWavURL();unlockEl.loop=true;unlockEl.setAttribute('playsinline','');unlockEl.volume=.01}
     const pr=unlockEl.play();pr&&pr.catch(()=>{})}catch(e){}
@@ -276,7 +260,7 @@ function resultCard(it){
 /* ---------- streaming player ---------- */
 // Songs are streamed, never fetched whole: the browser pulls only what you listen to, and nothing is kept.
 const player=new Audio();player.crossOrigin='anonymous';player.preload='none';player.setAttribute('playsinline','');
-let now=null,nowCard=null,openTok=0,primed=false,triedAlt=false,skim=false,segT=0,fails=0;
+let now=null,nowCard=null,openTok=0,primed=false,triedAlt=false,fails=0;
 function primePlayer(){ // phones only let a page start sound from a tap, so claim the player during the first one
   if(primed||now)return;primed=true;try{player.src=silentWavURL();const p=player.play();p&&p.catch(()=>{})}catch(e){}}
 ['pointerup','touchend','click'].forEach(ev=>document.addEventListener(ev,primePlayer,{passive:true}));
@@ -291,13 +275,13 @@ function release(){
 function setSrc(url){player.src=url;const p=player.play();p&&p.catch(()=>{})}
 async function openItem(it,card){
   if(now&&now.key===it.key&&!it.file){return player.paused?player.play().catch(()=>{}):player.pause()}
-  const tok=++openTok;cancelCap();closeSamp();unlockAudio();segT=0;
+  const tok=++openTok;cancelCap();closeSamp();unlockAudio();
   release();
   if(nowCard)nowCard.classList.remove('on');nowCard=card||null;if(card)card.classList.add('on');
   now=Object.assign({},it,{card:null});triedAlt=false;
   if('mediaSession' in navigator)try{navigator.mediaSession.metadata=new MediaMetadata({title:it.title,artist:it.artist||'',album:'The Crates'})}catch(e){}
   $('dock').hidden=false;document.body.classList.add('docked');$('dkT').textContent=it.title;dockMsg('Loading…');$('barF').style.width='0';
-  if(st.mode==='sample'){await ensureGraph();if(tok!==openTok)return}
+  await ensureGraph();if(tok!==openTok)return;
   try{
     if(it.file){now.alt=null;now.file=true;return setSrc(now.blob=URL.createObjectURL(it.file))}
     if(it.src==='commons'){
@@ -316,24 +300,18 @@ function closeDock(){openTok++;cancelCap();closeSamp();release();
   now=null;if(nowCard)nowCard.classList.remove('on');nowCard=null;$('dock').hidden=true;document.body.classList.remove('docked')}
 player.addEventListener('error',()=>{if(!now)return;
   if(now.alt&&!triedAlt){triedAlt=true;return setSrc(now.alt)}
-  dockMsg('Could not play this recording.'+(autoNext()?' Trying the next one…':' Try another one.'));syncPlayUI();
-  if(autoNext()&&++fails<4){const t=openTok;setTimeout(()=>{if(t===openTok)step(1)},1500)}});
+  dockMsg('Could not play this recording. Trying the next one…');syncPlayUI();
+  if(++fails<4){const t=openTok;setTimeout(()=>{if(t===openTok)step(1)},1500)}});
 player.addEventListener('waiting',()=>{if(now&&!cap)dockMsg('Loading…')});
 ['play','pause','playing','ended'].forEach(ev=>player.addEventListener(ev,syncPlayUI));
 player.addEventListener('playing',()=>{fails=0});
 ['play','seeking'].forEach(ev=>player.addEventListener(ev,()=>{if(!cap)chunks=[]}));
-player.addEventListener('seeked',()=>{segT=player.currentTime});
-player.addEventListener('loadedmetadata',()=>{const d=player.duration;if(skim&&now&&!now.file&&isFinite(d)&&d>40)player.currentTime=Math.min(12,d*.08)});
-player.addEventListener('ended',()=>{if(autoNext())step(1)});
+player.addEventListener('ended',()=>step(1)); // records play one after another
 // the bar moves on the player's own few-times-a-second clock, not a per-frame loop
 player.addEventListener('timeupdate',()=>{
   if(!now)return;const d=player.duration,t=player.currentTime;
   if(isFinite(d)&&d>0)$('barF').style.width=(t/d*100).toFixed(2)+'%';
-  if(!cap&&!player.paused&&player.readyState>2)dockMsg(tShort(t)+(isFinite(d)?' / '+tShort(d):'')+' · '+now.lic+(now.artist?' · '+now.artist:''));
-  // SKIM: a few seconds here, then hop ahead, then on to the next record
-  if(skim&&!cap&&!player.paused&&isFinite(d)&&t-segT>=SKIM_PLAY){const nx=segT+Math.max(SKIM_HOP,d/7);if(nx>=d-4)step(1);else{segT=nx;player.currentTime=nx}}});
-const SKIM_PLAY=6,SKIM_HOP=20;
-const autoNext=()=>st.mode==='listen'||skim;
+  if(!cap&&!player.paused&&player.readyState>2)dockMsg(tShort(t)+(isFinite(d)?' / '+tShort(d):'')+' · '+now.lic+(now.artist?' · '+now.artist:''))});
 async function step(dir){
   if(!now)return;let i=list.findIndex(x=>x.key===now.key);
   if(i<0&&now.file)return;
@@ -344,19 +322,16 @@ function capTick(){if(!cap)return;$('bSamp').textContent=(cap.held?'LET GO · ':
 function syncPlayUI(){
   const off=player.paused||!!player.error;$('bPlay').textContent=off?'▶':'❚❚';$('bPlay').classList.toggle('on',!off&&!!now);
   $('bSamp').classList.toggle('cap',!!cap);if(!cap)$('bSamp').textContent='HOLD TO SAMPLE';
-  $('bSkim').classList.toggle('on',skim);$('bSkim').textContent=skim?'SKIMMING':'SKIM';
   $('bSnip').textContent=snip?'■ STOP':'▶ HEAR IT';$('bSnip').classList.toggle('on',!!snip)}
 function seekTo(t){const d=player.duration;if(!now||!isFinite(d))return;cancelCap();player.currentTime=Math.max(0,Math.min(t,d-.2))}
 $('bPlay').onclick=()=>{if(!now)return;if(player.paused)player.play().catch(()=>{});else{cancelCap();player.pause()}};
-$('bBack5').onclick=()=>seekTo(player.currentTime-5);$('bFwd5').onclick=()=>seekTo(player.currentTime+5);
 $('dkX').onclick=closeDock;
 $('bPrev').onclick=()=>step(-1);$('bNext').onclick=()=>step(1);
-$('bSkim').onclick=()=>{skim=!skim;segT=player.currentTime;syncPlayUI();if(skim&&now&&player.paused)player.play().catch(()=>{})};
 if('mediaSession' in navigator)try{[['play',()=>player.play()],['pause',()=>player.pause()],['nexttrack',()=>step(1)],['previoustrack',()=>step(-1)]].forEach(([a,f])=>navigator.mediaSession.setActionHandler(a,f))}catch(e){}
 
 /* ---------- live sampling: record what plays while the button is held ---------- */
 const PRE=1.5,POST=.4,MAXCAP=60; // seconds kept either side for fine-tuning, and the longest sample
-let graph=null,gSrc=null,gRec=null,recOn=false,chunks=[],cap=null,cur=null,sel={s:0,e:1},view={s:0,e:1},hasSel=false;
+let graph=null,chunks=[],cap=null,cur=null,sel={s:0,e:1},view={s:0,e:1},hasSel=false;
 const lat=()=>AC?(AC.outputLatency||AC.baseLatency||0):0; // what you hear is this far behind the clock
 const REC_SRC=`class R extends AudioWorkletProcessor{constructor(){super();this.n=2048;this.l=new Float32Array(this.n);this.r=new Float32Array(this.n);this.i=0;this.f=0}
 process(inp){const c=inp[0],a=c&&c[0],b=c&&(c[1]||c[0]);if(this.i===0)this.f=currentFrame;
@@ -366,18 +341,16 @@ registerProcessor('rec',R)`;
 function ensureGraph(){
   if(graph)return graph;
   return graph=(async()=>{
-    initAudio();const src=gSrc=AC.createMediaElementSource(player);src.connect(AC.destination);
+    initAudio();const src=AC.createMediaElementSource(player);src.connect(AC.destination);
     try{
       await AC.audioWorklet.addModule(URL.createObjectURL(new Blob([REC_SRC],{type:'application/javascript'})));
       const n=new AudioWorkletNode(AC,'rec',{numberOfInputs:1,numberOfOutputs:0,channelCount:2,channelCountMode:'explicit'});
-      n.port.onmessage=ev=>onChunk(ev.data.l,ev.data.r,ev.data.n0);gRec=n
+      n.port.onmessage=ev=>onChunk(ev.data.l,ev.data.r,ev.data.n0);src.connect(n)
     }catch(e){ // older browsers
       const n=AC.createScriptProcessor(2048,2,2),z=AC.createGain();z.gain.value=0;
       n.onaudioprocess=ev=>{const b=ev.inputBuffer;onChunk(new Float32Array(b.getChannelData(0)),new Float32Array(b.getChannelData(1)),Math.round(ev.playbackTime*AC.sampleRate))};
-      n.connect(z);z.connect(AC.destination);gRec=n}
-    setRec(st.mode==='sample')
+      src.connect(n);n.connect(z);z.connect(AC.destination)}
   })().catch(()=>{})}
-function setRec(on){if(!gSrc||!gRec||on===recOn)return;recOn=on;try{on?gSrc.connect(gRec):gSrc.disconnect(gRec)}catch(e){}chunks=[]}
 function onChunk(l,r,n0){
   if(!now||(player.paused&&!cap))return;
   if(chunks.length&&n0!==chunks[chunks.length-1].n0+chunks[chunks.length-1].l.length&&!cap)chunks=[];
@@ -574,10 +547,9 @@ function showCrate(){
   openSheet('KEPT · '+crate.length+(crate.length===1?' SNIPPET':' SNIPPETS'),b)}
 $('bCrate').onclick=showCrate;
 $('bAbout').onclick=()=>{const b=el('div','about');b.innerHTML=
-  '<p><b>The Crates</b> is two things over the same shelves of old, free-to-use recordings.</p>'+
-  '<p><b>LISTEN.</b> Tap a record and it plays; when it ends the next one starts. ⏮ and ⏭ change record, and the lock screen controls work too.</p>'+
-  '<p><b>SAMPLE.</b> Tap a record, then hold HOLD TO SAMPLE while the part you want plays and let go when it ends. Only that part is captured. It loops so you can hear it; SAVE WAV keeps it, + KEEP sets it aside to save in a batch later.</p>'+
-  '<p><b>SKIM</b> (in both) plays a few seconds, hops ahead, and moves on to the next record, so you can scan a pile of records hands-free. Tap the bar to jump anywhere.</p>'+
+  '<p><b>The Crates</b> is a player and a sampler over shelves of old, free-to-use recordings.</p>'+
+  '<p><b>Listening.</b> Tap a record and it plays; when it ends the next one starts. ⏮ and ⏭ change record, and tapping the bar jumps anywhere in it. The lock screen controls work too.</p>'+
+  '<p><b>Sampling.</b> Hold HOLD TO SAMPLE while the part you want plays and let go when it ends. Only that part is captured. It loops so you can hear it; SAVE WAV keeps it, + KEEP sets it aside to save in a batch later.</p>'+
   '<p><b>Light on your phone.</b> Records are streamed, never downloaded whole, and nothing is stored. When you move to another record the last one is forgotten, so songs never pile up. A sample you close without saving or keeping is forgotten too. The app remembers only your settings, and kept snippets sit in memory until you close the app. The only files that ever land on your phone are WAVs you choose to save.</p>'+
   '<p><b>Getting samples onto an Akai.</b> Files are 16-bit, 44.1 kHz WAV, which every MPC and S-series sampler reads. Copy them to the card or USB drive your sampler uses. Names are capitals and digits, 16 characters at most, for older machines. Or run a cable from the headphone jack into the sampler\'s input and record while a record plays.</p>'+
   '<p><b>78s to '+CUT+'.</b> In the United States, sound recordings published in '+CUT+' or earlier are in the public domain, and one more year joins them each 1 January. These are discs and cylinders that libraries digitized for the Internet Archive, filtered by the catalogued date. A date is occasionally wrong, so check the source page before a release. They are records of their time, and some titles and lyrics are offensive.</p>'+
@@ -589,12 +561,6 @@ $('bAbout').onclick=()=>{const b=el('div','about');b.innerHTML=
 
 /* ---------- controls ---------- */
 function chips(host,list,label,isOn,pick){host.textContent='';list.forEach(v=>{const c=el('button','chip',label(v));c.type='button';c.classList.toggle('on',isOn(v));c.onclick=()=>pick(v);host.appendChild(c)})}
-function setMode(m){
-  st.mode=m;saveOpts();cancelCap();document.body.classList.toggle('m-listen',m!=='sample');
-  document.querySelectorAll('#modes button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
-  if(m==='sample'){if(now){unlockAudio();ensureGraph().then(()=>setRec(true))}}else{closeSamp();setRec(false)}
-  if(!list.length)$('status').textContent=m==='sample'?'Pick a word, or tap RANDOM PAGE. Tap a record to play it, then hold HOLD TO SAMPLE.':'Pick a word, or tap RANDOM PAGE. Tap a record and they play one after another.'}
-document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 function syncOpts(){
   chips($('srcs'),Object.keys(SRC),k=>SRC[k].name,k=>k===st.src,k=>{st.src=k;saveOpts();syncOpts();runSearch()});
   chips($('tags'),TAGS,t=>t,t=>t===st.q,t=>{st.q=t;$('q').value=t;syncOpts();runSearch()});
@@ -612,7 +578,7 @@ $('file').onchange=()=>{const f=$('file').files[0];$('file').value='';if(!f)retu
   openItem({src:'file',key:'file',file:f,title:f.name.replace(/\.[a-z0-9]+$/i,''),artist:'',year:'',lic:'Your own file',page:''})};
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelCap();stopSnip()}});
 syncOpts();
-setMode(st.mode);
+$('status').textContent='Pick a word, or tap RANDOM PAGE. Tap a record to play it. Hold HOLD TO SAMPLE to grab a snippet.';
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('../sw.js').catch(()=>{});
 </script>
 </body>
