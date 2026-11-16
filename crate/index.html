@@ -193,11 +193,12 @@ const crate=[];
 
 /* ---------- audio ---------- */
 let AC=null,unlockEl=null;
-function silentWavURL(){const sr=8000,n=sr/2,b=new ArrayBuffer(44+n*2),v=new DataView(b);
+let silentURL=null;
+function silentWavURL(){if(silentURL)return silentURL;const sr=8000,n=sr/2,b=new ArrayBuffer(44+n*2),v=new DataView(b);
   const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
   w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
   v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
-  return URL.createObjectURL(new Blob([b],{type:'audio/wav'}))}
+  return silentURL=URL.createObjectURL(new Blob([b],{type:'audio/wav'}))}
 function initAudio(){
   if(!AC){const C=window.AudioContext||window.webkitAudioContext;try{AC=new C({sampleRate:44100})}catch(e){AC=new C()}}
   return AC}
@@ -281,18 +282,24 @@ function primePlayer(){ // phones only let a page start sound from a tap, so cla
 ['pointerup','touchend','click'].forEach(ev=>document.addEventListener(ev,primePlayer,{passive:true}));
 const tShort=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 function dockMsg(t){$('dkS').textContent=t}
+// Moving on forgets the last record: stop it, hand its buffered audio back to the browser, drop anything recorded from it
+function release(){
+  try{player.pause()}catch(e){}
+  if(now&&now.blob){URL.revokeObjectURL(now.blob);now.blob=null}
+  try{player.removeAttribute('src');player.load()}catch(e){}
+  chunks=[]}
 function setSrc(url){player.src=url;const p=player.play();p&&p.catch(()=>{})}
 async function openItem(it,card){
   if(now&&now.key===it.key&&!it.file){return player.paused?player.play().catch(()=>{}):player.pause()}
   const tok=++openTok;cancelCap();closeSamp();unlockAudio();segT=0;
-  try{player.pause()}catch(e){}
+  release();
   if(nowCard)nowCard.classList.remove('on');nowCard=card||null;if(card)card.classList.add('on');
   now=Object.assign({},it,{card:null});triedAlt=false;
   if('mediaSession' in navigator)try{navigator.mediaSession.metadata=new MediaMetadata({title:it.title,artist:it.artist||'',album:'The Crates'})}catch(e){}
   $('dock').hidden=false;document.body.classList.add('docked');$('dkT').textContent=it.title;dockMsg('Loading…');$('barF').style.width='0';
   if(st.mode==='sample'){await ensureGraph();if(tok!==openTok)return}
   try{
-    if(it.file){now.alt=null;return setSrc(URL.createObjectURL(it.file))}
+    if(it.file){now.alt=null;now.file=true;return setSrc(now.blob=URL.createObjectURL(it.file))}
     if(it.src==='commons'){
       const direct=/mpeg|wav/.test(it.mime||''),nm=it.url.split('/').pop();
       now.alt=direct?null:it.url; // browsers that cannot play the transcode get the original
@@ -305,7 +312,7 @@ async function openItem(it,card){
     const f=au.find(f=>!f.name.includes('/'))||au[0]; // extra transfers of the same side sit in subfolders
     setSrc('https://archive.org/download/'+encodeURIComponent(it.id)+'/'+f.name.split('/').map(encodeURIComponent).join('/'))
   }catch(e){if(tok===openTok)dockMsg(e instanceof TypeError?'Could not reach the library. Check your connection.':e.message)}}
-function closeDock(){openTok++;cancelCap();try{player.pause();player.removeAttribute('src');player.load()}catch(e){}
+function closeDock(){openTok++;cancelCap();closeSamp();release();
   now=null;if(nowCard)nowCard.classList.remove('on');nowCard=null;$('dock').hidden=true;document.body.classList.remove('docked')}
 player.addEventListener('error',()=>{if(!now)return;
   if(now.alt&&!triedAlt){triedAlt=true;return setSrc(now.alt)}
@@ -468,7 +475,7 @@ function playSnip(){
   snip=p;syncPlayUI();(function f(){if(snip!==p)return;drawQ=false;draw();requestAnimationFrame(f)})()}
 function snipPos(){if(!snip)return null;const t=Math.max(0,AC.currentTime-snip.t0);return snip.loop?snip.s+t%(snip.e-snip.s):Math.min(snip.s+t,snip.e)}
 function replay(){if(snip)playSnip()}
-function closeSamp(){stopSnip();$('sampSheet').classList.remove('open')}
+function closeSamp(){stopSnip();$('sampSheet').classList.remove('open');cur=null;hasSel=false} // an unsaved sample is forgotten when you close it
 $('bSnip').onclick=()=>snip?stopSnip():playSnip();
 $('bResume').onclick=()=>{closeSamp();if(now)player.play().catch(()=>{})};
 $('spX').onclick=closeSamp;$('sampSheet').querySelector('.bg').onclick=closeSamp;
@@ -571,7 +578,7 @@ $('bAbout').onclick=()=>{const b=el('div','about');b.innerHTML=
   '<p><b>LISTEN.</b> Tap a record and it plays; when it ends the next one starts. ⏮ and ⏭ change record, and the lock screen controls work too.</p>'+
   '<p><b>SAMPLE.</b> Tap a record, then hold HOLD TO SAMPLE while the part you want plays and let go when it ends. Only that part is captured. It loops so you can hear it; SAVE WAV keeps it, + KEEP sets it aside to save in a batch later.</p>'+
   '<p><b>SKIM</b> (in both) plays a few seconds, hops ahead, and moves on to the next record, so you can scan a pile of records hands-free. Tap the bar to jump anywhere.</p>'+
-  '<p><b>Light on your phone.</b> Records are streamed, never downloaded whole, and nothing is stored. The app remembers only your settings. Kept snippets sit in memory until you close the app. The only files that ever land on your phone are WAVs you choose to save.</p>'+
+  '<p><b>Light on your phone.</b> Records are streamed, never downloaded whole, and nothing is stored. When you move to another record the last one is forgotten, so songs never pile up. A sample you close without saving or keeping is forgotten too. The app remembers only your settings, and kept snippets sit in memory until you close the app. The only files that ever land on your phone are WAVs you choose to save.</p>'+
   '<p><b>Getting samples onto an Akai.</b> Files are 16-bit, 44.1 kHz WAV, which every MPC and S-series sampler reads. Copy them to the card or USB drive your sampler uses. Names are capitals and digits, 16 characters at most, for older machines. Or run a cable from the headphone jack into the sampler\'s input and record while a record plays.</p>'+
   '<p><b>78s to '+CUT+'.</b> In the United States, sound recordings published in '+CUT+' or earlier are in the public domain, and one more year joins them each 1 January. These are discs and cylinders that libraries digitized for the Internet Archive, filtered by the catalogued date. A date is occasionally wrong, so check the source page before a release. They are records of their time, and some titles and lyrics are offensive.</p>'+
   '<p><b>Wikimedia PD.</b> Files on Wikimedia Commons marked public domain or CC0.</p>'+
