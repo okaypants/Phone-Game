@@ -67,6 +67,11 @@ button.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 #sheet .hd{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px;font-size:10px;letter-spacing:.16em}
 .about p{font-size:12px;line-height:1.65;margin:0 2px 12px}
 .about b{font-weight:600}
+#bSamp{display:block;width:100%;min-height:92px;margin-top:14px;border:1.4px solid var(--ink);border-radius:20px;background:var(--te);box-shadow:4px 4px 0 var(--ink);font-size:17px;font-weight:600;letter-spacing:.12em;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#bSamp.cap{background:var(--ink);color:var(--paper);transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+#hint{font-size:11px;line-height:1.6;opacity:.7;margin:10px 2px 0;text-align:center;min-height:18px}
+#fine{margin-top:16px;border-top:1.4px solid var(--ink);padding-top:4px}
+#fine summary{font-size:11px;font-weight:600;letter-spacing:.12em;padding:12px 2px;cursor:pointer}
 .empty{font-size:11px;line-height:1.7;opacity:.6;padding:18px 6px;text-align:center}
 </style>
 </head>
@@ -105,37 +110,50 @@ button.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
   </div>
   <div id="tracks" style="margin-top:12px"></div>
   <div id="editor" hidden>
-    <div class="lbl">WHOLE TRACK · TAP OR DRAG TO MOVE THE SNIPPET</div>
+    <div class="lbl">TAP THE WAVE TO JUMP AROUND</div>
     <canvas class="wave" id="ov"></canvas>
-    <div class="lbl">SNIPPET · DRAG EITHER EDGE</div>
-    <canvas class="wave" id="dt"></canvas>
-    <div id="read"><span><small>START</small><b id="rS"></b></span><span><small>LENGTH</small><b id="rL"></b></span><span><small>END</small><b id="rE"></b></span></div>
-    <div class="row" style="margin-top:10px;justify-content:space-between">
-      <div class="nud"><button class="btn" data-n="s-">◀</button><i>START</i><button class="btn" data-n="s+">▶</button></div>
-      <div class="nud"><button class="btn" data-n="e-">◀</button><i>END</i><button class="btn" data-n="e+">▶</button></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="bBack5">−5 s</button>
+      <button class="btn grow" id="bPlay">▶ PLAY</button>
+      <button class="btn" id="bFwd5">+5 s</button>
     </div>
-    <div class="lbl">LENGTH</div>
-    <div class="row" id="lens"></div>
-    <div class="lbl">LISTEN</div>
-    <div class="row">
-      <button class="btn grow hot" id="bSnip">▶ SNIPPET</button>
-      <button class="btn" id="bLoop">LOOP</button>
-      <button class="btn grow" id="bTrack">▶ FROM HERE</button>
+    <button id="bSamp">HOLD TO SAMPLE</button>
+    <div id="hint"></div>
+    <div id="samp" hidden>
+      <div class="lbl">YOUR SAMPLE · <span id="rL"></span></div>
+      <div class="row">
+        <button class="btn grow" id="bSnip">▶ HEAR IT</button>
+        <button class="btn grow hot" id="bSave">SAVE WAV</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn grow" id="bAdd">+ ADD TO CRATE</button>
+        <button class="btn grow" id="bResume">KEEP LISTENING</button>
+      </div>
+      <div id="exTx" style="font-size:11px;opacity:.7;margin:10px 2px 0;min-height:16px"></div>
+      <details id="fine">
+        <summary>FINE-TUNE (OPTIONAL)</summary>
+        <div class="lbl">DRAG EITHER EDGE</div>
+        <canvas class="wave" id="dt"></canvas>
+        <div id="read"><span><small>START</small><b id="rS"></b></span><span><small>END</small><b id="rE"></b></span></div>
+        <div class="row" style="margin-top:10px;justify-content:space-between">
+          <div class="nud"><button class="btn" data-n="s-">◀</button><i>START</i><button class="btn" data-n="s+">▶</button></div>
+          <div class="nud"><button class="btn" data-n="e-">◀</button><i>END</i><button class="btn" data-n="e+">▶</button></div>
+        </div>
+        <div class="lbl">SET LENGTH</div>
+        <div class="row" id="lens"></div>
+        <div class="lbl">NAME AND SOUND · 16-BIT 44.1 kHz WAV</div>
+        <div class="row">
+          <div class="grow"><input id="nm" maxlength="14" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Sample name"></div>
+          <button class="btn" id="bLoop">LOOP</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn grow" id="bMono">MONO</button>
+          <button class="btn grow" id="bNorm">NORMALIZE</button>
+        </div>
+        <div class="lbl">CHOP INTO EQUAL SLICES</div>
+        <div class="row" id="chops"></div>
+      </details>
     </div>
-    <div class="row" style="margin-top:8px"><button class="btn grow" id="bMark" disabled>MARK START AT PLAYHEAD</button></div>
-    <div class="lbl">EXPORT · 16-BIT 44.1 kHz WAV</div>
-    <div class="row">
-      <div class="grow"><input id="nm" maxlength="14" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Sample name"></div>
-      <button class="btn" id="bMono">MONO</button>
-      <button class="btn" id="bNorm">NORMALIZE</button>
-    </div>
-    <div class="lbl">CHOP INTO EQUAL SLICES</div>
-    <div class="row" id="chops"></div>
-    <div class="row" style="margin-top:14px">
-      <button class="btn grow hot" id="bSave">SAVE WAV</button>
-      <button class="btn grow" id="bAdd">+ ADD TO CRATE</button>
-    </div>
-    <div id="exTx" style="font-size:11px;opacity:.7;margin:10px 2px 0;min-height:16px"></div>
   </div>
 </main>
 
@@ -273,12 +291,12 @@ async function openItem(it){
   }catch(e){loadFail(e)}}
 const lenTx=l=>!l?'':/:/.test(l)?l:fmtT(+l).split('.')[0];
 function loadFail(e){if(e&&e.name==='AbortError')return;$('loading').hidden=false;$('prog').hidden=true;
-  $('loadTx').textContent=e instanceof TypeError?'Could not download this recording. Check your connection, or try another one.':(e&&e.message)||'Could not open this recording.'}
+  $('loadTx').textContent=e instanceof TypeError?'Could not load this recording. Check your connection, or try another one.':(e&&e.message)||'Could not open this recording.'}
 function loadMsg(t,f){$('loading').hidden=false;$('prog').hidden=false;$('loadTx').textContent=t;$('prog').firstElementChild.style.width=Math.round(f*100)+'%'}
 function cancelLoad(){if(loadCtl){loadCtl.abort();loadCtl=null}}
 async function fetchBytes(url,onProg){
   const ctl=loadCtl=new AbortController(),r=await fetch(url,{signal:ctl.signal});
-  if(!r.ok)throw new Error('Could not download this recording ('+r.status+').');
+  if(!r.ok)throw new Error('Could not load this recording ('+r.status+').');
   const total=+r.headers.get('content-length')||0;
   if(!r.body||!r.body.getReader)return r.arrayBuffer();
   const rd=r.body.getReader(),chunks=[];let n=0;
@@ -286,9 +304,9 @@ async function fetchBytes(url,onProg){
   const out=new Uint8Array(n);let o=0;for(const c of chunks){out.set(c,o);o+=c.length}
   return out.buffer}
 async function loadAudio(it,getBytes){
-  setMeta(it);loadMsg('Downloading…',0);
-  const bytes=await getBytes((f,n)=>loadMsg('Downloading… '+(n/1048576).toFixed(1)+' MB',f));
-  loadMsg('Decoding…',1);
+  setMeta(it);loadMsg('Loading…',0);
+  const bytes=await getBytes((f,n)=>loadMsg('Loading…',f));
+  loadMsg('Almost ready…',1);
   initAudio();
   let buf;
   try{buf=await new Promise((ok,no)=>{const p=AC.decodeAudioData(bytes,ok,no);if(p&&p.catch)p.catch(no)})}
@@ -296,8 +314,8 @@ async function loadAudio(it,getBytes){
   cur=Object.assign({},it,{buf,dur:buf.duration,peaks:makePeaks(buf,1400)});
   $('loading').hidden=true;$('editor').hidden=false;
   $('nm').value=akaiName(it.title);
-  const len=Math.min(2,cur.dur),s=Math.min(Math.max(0,cur.dur*.25),cur.dur-len);
-  setSel(s,s+len,true);updateExportTx()}
+  hasSel=false;cap=null;cursor=0;$('samp').hidden=true;$('fine').open=false;
+  startPlay('track',0)}
 function makePeaks(buf,n){
   const a=buf.getChannelData(0),b=buf.numberOfChannels>1?buf.getChannelData(1):null,pk=new Float32Array(n),per=a.length/n,step=Math.max(1,Math.floor(per/400));
   for(let i=0;i<n;i++){let m=0;const i0=Math.floor(i*per),i1=Math.min(a.length,Math.floor((i+1)*per));
@@ -311,7 +329,7 @@ function setSel(s,e,refit){
   if(!cur)return;
   s=Math.max(0,Math.min(s,cur.dur-MINLEN));e=Math.max(s+MINLEN,Math.min(e,cur.dur));
   sel={s,e};if(refit)fitView();
-  $('rS').textContent=fmtT(s);$('rE').textContent=fmtT(e);$('rL').textContent=(e-s).toFixed(e-s<1?3:2)+' s';
+  $('rS').textContent=fmtT(s);$('rE').textContent=fmtT(e);$('rL').textContent=(e-s).toFixed(2)+' SECONDS';
   document.querySelectorAll('#lens .chip').forEach(c=>c.classList.toggle('on',Math.abs(+c.dataset.l-(e-s))<.0005));
   draw();updateExportTx()}
 function fitView(){const len=sel.e-sel.s,pad=Math.max(.05,len*.3);view={s:Math.max(0,sel.s-pad),e:Math.min(cur.dur,sel.e+pad)}}
@@ -323,14 +341,15 @@ const INK='#1C1C1B',TE='#FF6A2B';
 function drawOv(){
   const c=$('ov'),g=sizeCanvas(c),W=c.width,H=c.height,pk=cur.peaks,n=pk.length;
   g.clearRect(0,0,W,H);
-  const x0=sel.s/cur.dur*W,x1=sel.e/cur.dur*W;
-  g.fillStyle='rgba(255,106,43,.35)';g.fillRect(x0,0,Math.max(2,x1-x0),H);
+  const ph=playPos(),at=ph==null?cursor:ph,rs=cap?cap.s:sel.s,re=cap?at:sel.e,x0=rs/cur.dur*W,x1=re/cur.dur*W,box=cap||hasSel;
+  if(box){g.fillStyle='rgba(255,106,43,.45)';g.fillRect(x0,0,Math.max(3,x1-x0),H)}
   g.fillStyle=INK;
   for(let x=0;x<W;x++){const v=pk[Math.min(n-1,Math.floor(x/W*n))],h=Math.max(1,v*H*.92);g.fillRect(x,(H-h)/2,1,h)}
-  g.fillStyle=TE;g.fillRect(x0-1,0,2,H);g.fillRect(x1-1,0,2,H);
-  const ph=playPos();if(ph!=null){g.fillStyle=INK;g.fillRect(ph/cur.dur*W-1,0,3,H)}}
+  if(box){g.fillStyle=TE;g.fillRect(x0-1,0,2,H);g.fillRect(x1-1,0,2,H)}
+  g.fillStyle=TE;g.fillRect(at/cur.dur*W-2,0,4,H);g.fillStyle=INK;g.fillRect(at/cur.dur*W-1,0,2,H)}
 function drawDt(){
-  const c=$('dt'),g=sizeCanvas(c),W=c.width,H=c.height,buf=cur.buf,a=buf.getChannelData(0),sr=buf.sampleRate,d=window.devicePixelRatio||1;
+  const c=$('dt');if(!hasSel||!$('fine').open)return;
+  const g=sizeCanvas(c),W=c.width,H=c.height,buf=cur.buf,a=buf.getChannelData(0),sr=buf.sampleRate,d=window.devicePixelRatio||1;
   g.clearRect(0,0,W,H);
   const tx=t=>(t-view.s)/(view.e-view.s)*W,x0=tx(sel.s),x1=tx(sel.e);
   g.fillStyle='rgba(255,106,43,.22)';g.fillRect(x0,0,x1-x0,H);
@@ -349,39 +368,70 @@ function dragOn(c,fn,done){
   c.addEventListener('pointermove',ev=>{if(ev.pointerId===id)fn(at(ev),false)});
   const up=ev=>{if(ev.pointerId===id){id=null;done&&done()}};
   c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up)}
-dragOn($('ov'),f=>{const len=sel.e-sel.s,s=Math.max(0,Math.min(f*cur.dur-len/2,cur.dur-len));setSel(s,s+len,true)},()=>replay());
+dragOn($('ov'),(f,first)=>{if(first){cap=null;stopPlay()}cursor=f*cur.dur;draw()},()=>startPlay('track'));
 let grab='s';
 dragOn($('dt'),(f,first)=>{const t=view.s+f*(view.e-view.s);
   if(first)grab=Math.abs(t-sel.s)<=Math.abs(t-sel.e)?'s':'e';
   if(grab==='s')setSel(Math.min(t,sel.e-MINLEN),sel.e);else setSel(sel.s,Math.max(t,sel.s+MINLEN))},()=>{fitView();draw();replay()});
 window.addEventListener('resize',draw);
 
-/* ---------- playback ---------- */
-let play=null;
-function stopPlay(){if(play){const p=play;play=null;try{p.node.onended=null;p.node.stop()}catch(e){}}syncPlayUI()}
-function startPlay(mode){
+/* ---------- playback + sampling ---------- */
+let play=null,cursor=0,hasSel=false,cap=null;
+const HINT='Hold the button while the part you want plays, then let go.';
+const lat=()=>AC?(AC.outputLatency||AC.baseLatency||0):0; // what you hear is this far behind the clock
+function stopPlay(){
+  if(play){const p=play;if(p.mode==='track')cursor=playPos();play=null;try{p.node.onended=null;p.node.stop()}catch(e){}}
+  syncPlayUI();draw()}
+function startPlay(mode,from){
   if(!cur)return;stopPlay();unlockAudio();
   const node=AC.createBufferSource();node.buffer=cur.buf;node.connect(AC.destination);
-  const p={node,mode,t0:AC.currentTime+.02,s:sel.s,e:sel.e,loop:mode==='snip'&&st.loop};
-  if(p.loop){node.loop=true;node.loopStart=p.s;node.loopEnd=p.e;node.start(p.t0,p.s)}
-  else if(mode==='snip')node.start(p.t0,p.s,p.e-p.s);
-  else node.start(p.t0,p.s);
-  node.onended=()=>{if(play===p){play=null;syncPlayUI();draw()}};
+  const p={node,mode,t0:AC.currentTime+.02,loop:mode==='snip'&&st.loop};
+  if(mode==='snip'){p.s=sel.s;p.e=sel.e;
+    if(p.loop){node.loop=true;node.loopStart=p.s;node.loopEnd=p.e;node.start(p.t0,p.s)}else node.start(p.t0,p.s,p.e-p.s)}
+  else{if(from==null)from=cursor;if(from>=cur.dur-.05)from=0;p.s=from;p.e=cur.dur;node.start(p.t0,from)}
+  node.onended=()=>{if(play!==p)return;play=null;if(mode==='track'){cursor=0;if(cap)endCap(cur.dur)}syncPlayUI();draw()};
   play=p;syncPlayUI();tick()}
 function playPos(){
   if(!play||!cur)return null;const t=Math.max(0,AC.currentTime-play.t0);
   if(play.loop)return play.s+t%(play.e-play.s);
-  return Math.min(play.s+t,play.mode==='snip'?play.e:cur.dur)}
-function tick(){if(!play)return;drawQ=false;draw();requestAnimationFrame(tick)}
-function replay(){if(play)startPlay(play.mode)}
+  return Math.min(play.s+t,play.e)}
+function tick(){if(!play)return;if(cap)$('hint').textContent='Sampling… '+Math.max(0,playPos()-cap.s).toFixed(1)+' s';drawQ=false;draw();requestAnimationFrame(tick)}
+function replay(){if(play&&play.mode==='snip')startPlay('snip')}
 function syncPlayUI(){
   const m=play&&play.mode;
-  $('bSnip').textContent=m==='snip'?'■ STOP':'▶ SNIPPET';$('bTrack').textContent=m==='track'?'■ STOP':'▶ FROM HERE';
-  $('bSnip').classList.toggle('on',m==='snip');$('bTrack').classList.toggle('on',m==='track');$('bMark').disabled=m!=='track'}
+  $('bPlay').textContent=m==='track'?'❚❚ PAUSE':'▶ PLAY';$('bPlay').classList.toggle('on',m==='track');
+  $('bSnip').textContent=m==='snip'?'■ STOP':'▶ HEAR IT';$('bSnip').classList.toggle('on',m==='snip');
+  $('bSamp').classList.toggle('cap',!!cap);
+  $('bSamp').textContent=cap?(cap.held?'LET GO TO FINISH':'TAP TO FINISH'):hasSel?'HOLD TO SAMPLE AGAIN':'HOLD TO SAMPLE';
+  if(!cap)$('hint').textContent=HINT}
+function jump(d){const was=play&&play.mode==='track';cap=null;stopPlay();cursor=Math.max(0,Math.min(cursor+d,cur.dur-.05));if(was)startPlay('track');else draw()}
+// sampling: hold the button for the part you want. A quick tap starts it instead, and a second tap ends it
+function capDown(){
+  if(!cur)return;
+  if(cap){const t=playPos();return endCap(t==null?null:t-lat())}
+  let s;
+  if(play&&play.mode==='track')s=Math.max(0,playPos()-lat());else{startPlay('track');s=play.s}
+  cap={s,t:performance.now(),held:true};syncPlayUI()}
+function capUp(){
+  if(!cap||!cap.held)return;cap.held=false;
+  if(performance.now()-cap.t<250)return syncPlayUI();
+  const t=playPos();endCap(t==null?null:t-lat())}
+function endCap(e){
+  const s=cap.s;cap=null;
+  if(e==null||e-s<.03){syncPlayUI();draw();return}
+  hasSel=true;$('samp').hidden=false;setSel(s,e,true);startPlay('snip');
+  $('samp').scrollIntoView({block:'nearest',behavior:'smooth'})}
+(b=>{let id=null;
+  b.addEventListener('pointerdown',ev=>{id=ev.pointerId;try{b.setPointerCapture(id)}catch(e){}ev.preventDefault();capDown()});
+  const up=ev=>{if(ev.pointerId===id){id=null;capUp()}};
+  b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
+  b.addEventListener('contextmenu',ev=>ev.preventDefault())})($('bSamp'));
+$('bPlay').onclick=()=>{if(play&&play.mode==='track'){cap=null;stopPlay()}else startPlay('track')};
+$('bBack5').onclick=()=>jump(-5);$('bFwd5').onclick=()=>jump(5);
 $('bSnip').onclick=()=>play&&play.mode==='snip'?stopPlay():startPlay('snip');
-$('bTrack').onclick=()=>play&&play.mode==='track'?stopPlay():startPlay('track');
-$('bMark').onclick=()=>{const t=playPos();if(t==null)return;const len=sel.e-sel.s,s=Math.min(t,cur.dur-len);setSel(s,s+len,true)};
-$('bLoop').onclick=()=>{st.loop=!st.loop;saveOpts();syncOpts();if(play&&play.mode==='snip')startPlay('snip')};
+$('bResume').onclick=()=>{cursor=sel.e;startPlay('track')};
+$('bLoop').onclick=()=>{st.loop=!st.loop;saveOpts();syncOpts();replay()};
+$('fine').addEventListener('toggle',()=>{if(cur&&hasSel){fitView();draw()}});
 
 /* ---------- export ---------- */
 function renderSel(s,e,gain){
@@ -475,8 +525,9 @@ function showCrate(){
   openSheet('CRATE · '+crate.length+(crate.length===1?' SNIPPET':' SNIPPETS'),b)}
 $('bCrate').onclick=showCrate;
 $('bAbout').onclick=()=>{const b=el('div','about');b.innerHTML=
-  '<p><b>What this is.</b> A way to find old recordings that are free to use, cut a short piece out of one, and save it as a WAV file your sampler can load.</p>'+
-  '<p><b>Getting it onto an Akai.</b> Files are 16-bit, 44.1 kHz WAV, which every MPC and S-series sampler reads. Copy them to the SD card, CF card or USB drive your sampler uses. Names are kept to 16 characters, capitals and digits, for older machines. Or do it the old way: run a cable from the headphone jack into the sampler\'s input, turn LOOP off, and record while the snippet plays.</p>'+
+  '<p><b>What this is.</b> A way to find old recordings that are free to use, grab a short piece of one, and save it as a WAV file your sampler can load.</p>'+
+  '<p><b>How to sample.</b> Tap a record and it starts playing. Hold HOLD TO SAMPLE while the part you want plays and let go when it ends. Your sample then loops so you can hear it; tap SAVE WAV to keep it, or hold the button again for another go. Nothing is saved to your phone until you tap SAVE.</p>'+
+  '<p><b>Getting it onto an Akai.</b> Files are 16-bit, 44.1 kHz WAV, which every MPC and S-series sampler reads. Copy them to the SD card, CF card or USB drive your sampler uses. Names are kept to 16 characters, capitals and digits, for older machines. Or do it the old way: run a cable from the headphone jack into the sampler\'s input, turn LOOP off under FINE-TUNE, and record while the sample plays.</p>'+
   '<p><b>78s to '+CUT+'.</b> In the United States, sound recordings published in '+CUT+' or earlier are in the public domain, and one more year joins them each 1 January. These results are discs and cylinders that libraries digitized for the Internet Archive (the Great 78 Project, the Edison collection and Boston Public Library), filtered by the catalogued date. A date is occasionally wrong, so check the source page before a release.</p>'+
   '<p><b>Wikimedia PD.</b> Files on Wikimedia Commons that are marked public domain or CC0. Each one links to its page, which says why it is free.</p>'+
   '<p><b>Outside the US</b> the rules differ, and many countries protect recordings for 70 years or more after release.</p>'+
@@ -500,11 +551,11 @@ $('bNorm').onclick=()=>{st.norm=!st.norm;saveOpts();syncOpts()};
 $('fSearch').onsubmit=ev=>{ev.preventDefault();st.q=$('q').value.trim();$('q').blur();syncOpts();runSearch()};
 $('bMore').onclick=()=>runSearch(true);
 $('bRandom').onclick=()=>runSearch(false,true);
-$('bBack').onclick=()=>{stopPlay();cancelLoad();showView('dig')};
+$('bBack').onclick=()=>{cap=null;stopPlay();cancelLoad();showView('dig')};
 $('bFile').onclick=()=>$('file').click();
 $('file').onchange=()=>{const f=$('file').files[0];$('file').value='';if(!f)return;
   openItem({src:'file',file:f,title:f.name.replace(/\.[a-z0-9]+$/i,''),artist:'',year:'',lic:'Your own file',page:''})};
-document.addEventListener('visibilitychange',()=>{if(document.hidden)stopPlay()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cap=null;stopPlay()}});
 syncOpts();
 $('status').textContent='Pick a word, or tap RANDOM PAGE. Everything here is public domain; tap ? for what that means.';
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('../sw.js').catch(()=>{});
