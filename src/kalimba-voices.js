@@ -1,7 +1,8 @@
 function kal(type,f,bright,v,pn){if(!AC)return;const t=now(),o=outNode(pn,v);
-  const wet=(r,d)=>{if(!space)return;[[r,rIn],[d,dIn]].forEach(([amt,dest])=>{const x=AC.createGain();x.gain.value=amt;o.connect(x);x.connect(dest)})}; // extra room/echo for the dreamy voices
+  const wet=(r,d)=>{[[r*2*SHAPE.verb,rIn],[d*2*SHAPE.echo,dIn]].forEach(([amt,dest])=>{if(amt<.002)return;const x=AC.createGain();x.gain.value=amt;o.connect(x);x.connect(dest)})}; // extra room/echo for the dreamy voices
   const tone=AC.createBiquadFilter();tone.type='lowpass';tone.Q.value=.5;tone.frequency.value=type==='felt'?600+bright*1800:1200+bright*7000;tone.connect(o);
-  const part=(ratio,gain,dec,wave='sine',det=0,dest=tone,a=.002)=>{const x=AC.createOscillator();x.type=wave;
+  const TM=tailMul(),AT=atkTime(),part=(ratio,gain,dec,wave='sine',det=0,dest=tone,a=.002)=>{dec*=TM;a=Math.max(a,AT*.8); // SWELL: the partial itself blooms late, so slow attacks don't just mute the pluck
+   const x=AC.createOscillator();x.type=wave;
     x.frequency.setValueAtTime(f*ratio*1.008,t);x.frequency.exponentialRampToValueAtTime(f*ratio,t+.03);x.detune.value=det;
     const g=AC.createGain();x.connect(g);g.connect(dest);adsr(g.gain,t,a,Math.max(gain,.0003),dec);x.start(t);x.stop(t+a+dec+.05);return x};
   const click=(fr,q,gain,dec)=>{const n=noiseSrc(),bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=fr;bp.Q.value=q;

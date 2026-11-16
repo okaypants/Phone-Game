@@ -8,11 +8,11 @@ const SYN_FX={dream:[.05,.6],'808':[0,0],moog:[0,.04],arp:[.1,.14],electro:[0,.0
 // monophonic instruments glide (portamento) between held notes
 const MONO={'808':.075,moog:.06,arp:.09,vox:.08};
 let masterOut=null,driveCurve=null,dryBus=null,dIn=null,rIn=null;
-function synthOut(type,pn,v){const n=AC.createGain();n.gain.value=v;let tail=n;
+function synthOut(type,pn,v){const n=AC.createGain();noteGain(n,v);let tail=n;
   if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=clamp(pn,-1,1);n.connect(p);tail=p}
-  tail.connect(dryBus);const[dS,rS]=SYN_FX[type];
-  if(space&&dS){const s=AC.createGain();s.gain.value=dS;tail.connect(s);s.connect(dIn)}
-  if(space&&rS){const s=AC.createGain();s.gain.value=rS;tail.connect(s);s.connect(rIn)}
+  tail.connect(dryBus);const dS=fxAmt(SYN_FX[type][0],SHAPE.echo,.28),rS=fxAmt(SYN_FX[type][1],SHAPE.verb,.4);
+  if(dS>.002){const s=AC.createGain();s.gain.value=dS;tail.connect(s);s.connect(dIn)}
+  if(rS>.002){const s=AC.createGain();s.gain.value=rS;tail.connect(s);s.connect(rIn)}
   return n}
 function synth(type,f,pn){if(!AC)return null;const bright=SYN_TONE[type],v=.8,t=now(),o=synthOut(type,pn,v);
   if(!driveCurve)driveCurve=satCurve(3.5);
@@ -58,7 +58,7 @@ function synth(type,f,pn){if(!AC)return null;const bright=SYN_TONE[type],v=.8,t=
   const kill=r=>{if(done)return;done=true;self.dead=true;const tt=now();amp.gain.cancelScheduledValues(tt);amp.gain.setValueAtTime(Math.max(amp.gain.value,.0001),tt);amp.gain.setTargetAtTime(.0001,tt,r/3);nodes.forEach(n=>{try{n.stop(tt+r*1.7+.3)}catch(e){}})};
   if(!sus)setTimeout(()=>kill(.05),3500);
   self.safety=setTimeout(()=>kill(.4),20000); // safety: no stuck notes (cancelled when HOLD latches the note)
-  self.release=()=>kill(rel);
+  self.release=()=>kill(rel*tailMul());
   self.glide=(fn,time)=>{if(done)return;const tt=now();for(const[x,ratio]of pitched){const fq=x.frequency;fq.cancelScheduledValues(tt);fq.setValueAtTime(fq.value,tt);fq.exponentialRampToValueAtTime(Math.max(20,fn*ratio),tt+time)}};
   return self}
 

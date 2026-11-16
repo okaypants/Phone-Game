@@ -1,5 +1,17 @@
 // ───────── audio ─────────
-let AC=null,bus,NOISE;
+let AC=null,bus,NOISE,drvG=null,drvPost=null,toneF=null,wobG=null,wobLFO=null;
+// ───────── SHAPE: one set of sound controls for every voice (0…1 each) ─────────
+const SHAPE_DEF={echo:.5,verb:.5,tone:1,edge:0,swell:0,tail:.5,grit:0,wob:0},SHAPE={...SHAPE_DEF};
+try{Object.assign(SHAPE,JSON.parse(localStorage.getItem('kz-shape')||'{}'))}catch(e){}
+const atkTime=()=>SHAPE.swell*SHAPE.swell*1.2,tailMul=()=>Math.pow(3,SHAPE.tail*2-1);
+// per-voice send: the slider's middle is the voice's own amount, the top pushes even dry voices wet
+const fxAmt=(base,x,top)=>x<=.5?base*2*x:base+(Math.max(base*2,top)-base)*(x-.5)*2;
+const noteGain=(n,g)=>{const a=atkTime(),t=AC.currentTime;if(a>.004){n.gain.setValueAtTime(0,t);n.gain.linearRampToValueAtTime(g,t+a)}else n.gain.value=g};
+function applyShape(){if(!AC)return;const t=AC.currentTime,S=SHAPE,oct=S.wob*2.2;
+  ds.gain.setTargetAtTime(.52*S.echo,t,.05);rs.gain.setTargetAtTime(.76*S.verb,t,.05);
+  toneF.frequency.setTargetAtTime(200*Math.pow(80,S.tone)/Math.pow(2,oct),t,.03);toneF.Q.setTargetAtTime(.3+S.edge*S.edge*16,t,.03);
+  wobG.gain.setTargetAtTime(oct*1200,t,.05);wobLFO.frequency.setTargetAtTime(typeof metOn!=='undefined'&&metOn?metBpm/30:2.8,t,.05);
+  const g=1+S.grit*S.grit*9;drvG.gain.setTargetAtTime(g,t,.03);drvPost.gain.setTargetAtTime(1/(1+S.grit*1.6),t,.03)}
 function satCurve(k){const n=1024,c=new Float32Array(n);for(let i=0;i<n;i++){const x=i/(n-1)*2-1;c[i]=Math.tanh(k*x)/Math.tanh(k)}return c}
 function makeIR(sec){const sr=AC.sampleRate,len=Math.floor(sr*sec),b=AC.createBuffer(2,len,sr);
   for(let c=0;c<2;c++){const d=b.getChannelData(c);let lp=0;for(let i=0;i<len;i++){const t=i/sr;lp+=((Math.random()*2-1)-lp)*.35;d[i]=lp*Math.exp(-t*3.2/sec)*(t<.012?t/.012:1)}}return b}
@@ -12,7 +24,9 @@ function initAudio(){
   const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=16000;lp.Q.value=.3;
   const comp=AC.createDynamicsCompressor();comp.threshold.value=-16;comp.knee.value=12;comp.ratio.value=3.5;comp.attack.value=.006;comp.release.value=.22;
   const mg=AC.createGain();mg.gain.value=.9;
-  bus.connect(sat);dryBus=AC.createGain();dryBus.gain.value=.7;dryBus.connect(sat);sat.connect(hp);hp.connect(lp);lp.connect(comp);comp.connect(mg);mg.connect(AC.destination);masterOut=mg;
+  drvG=AC.createGain();drvPost=AC.createGain();toneF=lp; // grit → saturator → … → master low-pass (tone/edge), wobbled by an LFO
+  bus.connect(drvG);dryBus=AC.createGain();dryBus.gain.value=.7;dryBus.connect(drvG);drvG.connect(sat);sat.connect(drvPost);drvPost.connect(hp);hp.connect(lp);
+  wobLFO=AC.createOscillator();wobLFO.frequency.value=2.8;wobG=AC.createGain();wobG.gain.value=0;wobLFO.connect(wobG);wobG.connect(lp.detune);wobLFO.start();lp.connect(comp);comp.connect(mg);mg.connect(AC.destination);masterOut=mg;
   // room
   const conv=AC.createConvolver();conv.buffer=makeIR(3.4);rs=AC.createGain();rs.gain.value=.32;
   bus.connect(rs);rs.connect(conv);conv.connect(hp);
@@ -25,7 +39,7 @@ function initAudio(){
   const lfo=AC.createOscillator();lfo.frequency.value=.35;const lg=AC.createGain();lg.gain.value=.0025;lfo.connect(lg);lg.connect(d.delayTime);lfo.start();dIn=d;rIn=conv;
 }
 const now=()=>AC.currentTime;
-function outNode(pn,g){const n=AC.createGain();n.gain.value=g;if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=clamp(pn,-1,1);n.connect(p);p.connect(bus)}else n.connect(bus);return n}
+function outNode(pn,g){const n=AC.createGain();noteGain(n,g);if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=clamp(pn,-1,1);n.connect(p);p.connect(bus)}else n.connect(bus);return n}
 function adsr(prm,t,a,peak,d){prm.cancelScheduledValues(t);prm.setValueAtTime(.0001,t);prm.exponentialRampToValueAtTime(Math.max(peak,.0002),t+a);prm.exponentialRampToValueAtTime(.0001,t+a+d)}
 function noiseSrc(){const s=AC.createBufferSource();s.buffer=NOISE;s.loop=true;s.playbackRate.value=.8+Math.random()*.4;return s}
 

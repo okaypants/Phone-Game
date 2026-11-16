@@ -57,6 +57,17 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
 #bRec.recording .led{background:#E5372B;box-shadow:0 0 8px #E5372B;animation:blink 1s steps(2) infinite}
 #bRec.recording .val{color:var(--paper);font-size:12px}
 @keyframes blink{50%{opacity:.25}}
+.knob{display:block;border:1.4px solid var(--ink);border-radius:14px;background:#F7F4EE;box-shadow:3px 3px 0 var(--ink);padding:7px 12px 6px}
+.knob .kh{display:flex;align-items:baseline;gap:8px}.knob b{font-size:15px;font-weight:600}.knob small{flex:1;min-width:0;font-size:8.5px;letter-spacing:.06em;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.knob output{font-size:11px;font-weight:600;opacity:.75}
+.knob .ends{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.06em;opacity:.6}.knob .ends i{font-style:normal}
+.knob input{-webkit-appearance:none;appearance:none;outline:none;display:block;width:100%;height:30px;margin:1px 0 0;background:transparent;touch-action:pan-y}
+.knob input::-webkit-slider-runnable-track{height:12px;border:1.4px solid var(--ink);border-radius:999px;background:linear-gradient(to right,#F2B8A2 var(--p),#FBF8F1 var(--p))}
+.knob input::-moz-range-track{height:12px;border:1.4px solid var(--ink);border-radius:999px;background:linear-gradient(to right,#F2B8A2 var(--p),#FBF8F1 var(--p))}
+.knob input::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-9.4px;border-radius:50%;background:#FBF8F1;border:1.4px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.knob input::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#FBF8F1;border:1.4px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.knob.mod b::after{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--te);margin-left:6px;vertical-align:middle}
+#shReset{font:inherit;font-size:11px;letter-spacing:.12em;border:1.4px solid var(--ink);background:transparent;border-radius:999px;padding:12px 16px;color:var(--ink)}
 .take{display:flex;align-items:center;gap:8px;border:1.4px solid var(--ink);border-radius:14px;background:#F7F4EE;box-shadow:3px 3px 0 var(--ink);padding:7px}
 .take button{flex:0 0 46px;height:46px;border:1.4px solid var(--ink);border-radius:11px;background:transparent;color:var(--ink);font:600 16px/1 'IBM Plex Mono',monospace;-webkit-tap-highlight-color:transparent}
 .take button.pl.on{background:var(--ink);color:var(--paper)}
@@ -81,7 +92,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:b
   <button class="cap" id="bRoot"><span class="lbl"><span class="num">02 </span>KEY</span><span class="val">C</span><i class="led"></i></button>
   <button class="cap" id="bScale"><span class="lbl"><span class="num">03 </span>SCALE</span><span class="val">maj</span><i class="led"></i></button>
   <button class="cap" id="bKeys"><span class="lbl"><span class="num">04 </span>ROWS</span><span class="val">2×7</span><i class="led"></i></button>
-  <button class="cap on" id="bSpace"><span class="lbl"><span class="num">05 </span>SPACE</span><span class="val">on</span><i class="led"></i></button>
+  <button class="cap" id="bShape"><span class="lbl"><span class="num">05 </span>SHAPE</span><span class="val">stock</span><i class="led"></i></button>
   <div class="cap oct" id="oct"><button id="oDn" aria-label="octave down">−</button><span class="mid"><span class="lbl">OCT</span><span class="val" id="oVal">0</span></span><button id="oUp" aria-label="octave up">+</button></div>
   <button class="cap wide nar" id="bGlide"><span class="lbl">GLIDE</span><span class="val">short</span></button>
   <button class="cap wide nar" id="bHold"><span class="lbl">HOLD</span><span class="val">off</span><i class="led"></i></button>
@@ -120,7 +131,7 @@ const TUNE=()=>[ROOTS[rootI]+' '+SCALE_LIST[scaleI][0],261.63*Math.pow(2,(rootI>
 const stepsOf=S=>S.map((v,i)=>((i+1<S.length?S[i+1]:12)-v)).map(d=>d===1?'H':d===2?'W':d===3?'3':d===4?'4':d).join(' ');
 // rows × keys per row; every key stays ≥ ~45px wide for thumbs
 const OPTS={p:[[1,5],[2,5],[1,7],[2,7],[3,7],[2,8],[3,8]],l:[[1,7],[1,9],[2,9],[2,11],[2,13],[2,15]]};
-let soundI=0,space=true,optP=3,optL=4;
+let soundI=0,optP=3,optL=4;
 const isLand=()=>W>H*1.1;
 const cfg=()=>isLand()?OPTS.l[optL]:OPTS.p[optP];
 function baseRoot(){const[,root,S]=TUNE(),[r,n]=cfg(),N=r*n;let d=clamp(Math.floor(N/S.length/2-.5),0,3);while(d>0&&root/Math.pow(2,d)<60)d--;return root/Math.pow(2,d)}
@@ -289,8 +300,8 @@ function openSheet(title,opts,minW){$('shTitle').textContent=title;shGrid.style.
     b.addEventListener('click',()=>{o.act();buzz(8);closeSheet();o.quiet||setTimeout(preview,60)});shGrid.appendChild(b)});sheet.classList.add('open')}
 sheet.querySelector('.bg').addEventListener('click',closeSheet);$('shDone').addEventListener('click',closeSheet);
 function syncCaps(){const sv=$('bSound').querySelector('.val');sv.textContent=SOUNDS[soundI][0];sv.style.fontSize=SOUNDS[soundI][0].length>5&&innerWidth<440?'11.5px':'';setSwatch();$('bRoot').querySelector('.val').textContent=ROOTS[rootI];$('bScale').querySelector('.val').textContent=SCALE_LIST[scaleI][0];
-  // grey out controls that do nothing for this sound: glide is mono-synth only, hold needs a sustaining synth, the 808 has no echo/room
-  const ty=SOUNDS[soundI][0];$('bGlide').classList.toggle('dis',MONO[ty]===undefined);$('bHold').classList.toggle('dis',!canLatch());$('bSpace').classList.toggle('dis',ty==='808')}
+  // grey out controls that do nothing for this sound: glide is mono-synth only, hold needs a sustaining synth, 
+  const ty=SOUNDS[soundI][0];$('bGlide').classList.toggle('dis',MONO[ty]===undefined);$('bHold').classList.toggle('dis',!canLatch())}
 function setOct(d){const n=clamp(octave+d,-3,2);if(n===octave){buzz([4,30,4]);return}octave=n;$('oVal').textContent=(octave>0?'+':'')+octave;
   allOff();preview()}
 ['oDn','oUp'].forEach((id,i)=>{const el=$(id);el.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();el.classList.add('down');setTimeout(()=>el.classList.remove('down'),110);buzz(8);setOct(i?1:-1)})});
@@ -321,13 +332,26 @@ function metTick(){if(!AC||!metOn)return;while(metNext<now()+.12){const t=Math.m
   o.type='square';o.frequency.value=acc?1570:1050;o.connect(g);g.connect(metGain);adsr(g.gain,t,.001,acc?.45:.3,.035);o.start(t);o.stop(t+.06); // woodblock-ish: square body…
   const n=noiseSrc(),hp=AC.createBiquadFilter(),ng=AC.createGain();hp.type='highpass';hp.frequency.value=3000;n.connect(hp);hp.connect(ng);ng.connect(metGain);adsr(ng.gain,t,.001,acc?.5:.35,.012);n.start(t);n.stop(t+.03); // …plus a bright tick that cuts through
   const bi=metBeat%4;setTimeout(()=>{metFlash=performance.now();metShown=bi},Math.max(0,(t-now())*1000));metBeat++;metNext+=60/metBpm}}
-function setMet(bpm){clearInterval(metTimer);metOn=!!bpm&&!!AC;const el=$('bMet');el.querySelector('.val').textContent=metOn?bpm:'off';if(!metOn){el.classList.remove('on');return}
+function setMet(bpm){clearInterval(metTimer);metOn=!!bpm&&!!AC;const el=$('bMet');el.querySelector('.val').textContent=metOn?bpm:'off';if(!metOn){el.classList.remove('on');applyShape();return}
   metBpm=bpm;if(!metGain){metGain=AC.createGain();metGain.gain.value=MET_VOLS[metVol][1];metGain.connect(AC.destination)}
-  dIn.delayTime.setTargetAtTime(60/bpm*.75,now(),.05); // echo follows the tempo
+  dIn.delayTime.setTargetAtTime(60/bpm*.75,now(),.05);applyShape(); // echo and wobble follow the tempo
   metNext=now()+.1;metBeat=0;metTimer=setInterval(metTick,25)}
 press($('bMet'),()=>openSheet('CLICK · not recorded',[{label:'off',sub:'silent',sel:!metOn,quiet:true,act:()=>setMet(0)}].concat(TEMPOS.map(b=>({label:b,sub:'bpm',sel:metOn&&b===metBpm,quiet:true,act:()=>setMet(b)})),MET_VOLS.map(([l,v],i)=>({label:l,sub:'volume',sel:i===metVol,quiet:true,act:()=>{metVol=i;if(metGain)metGain.gain.value=v}}))),76));
-press($('bSpace'),()=>{space=!space;$('bSpace').classList.toggle('on',space);$('bSpace').querySelector('.val').textContent=space?'on':'dry';
-  if(AC){ds.gain.setTargetAtTime(space?.26:.04,now(),.1);rs.gain.setTargetAtTime(space?.38:.14,now(),.1)}});
+// ───────── SHAPE sheet: plain-word sliders, with the synth term underneath ─────────
+const KNOBS=[['echo','ECHO','tape delay · follows the click tempo','none','lots'],['verb','REVERB','room size','dry','cathedral'],
+ ['tone','TONE','low-pass filter cutoff','dark','bright'],['edge','EDGE','filter resonance','smooth','whistly'],
+ ['swell','SWELL','envelope attack','snappy','slow fade-in'],['tail','TAIL','envelope decay · release','short','long'],
+ ['grit','GRIT','drive · saturation','clean','crunchy'],['wob','WOBBLE','LFO → filter, in time with the click','still','wub wub']];
+function syncShape(){const mod=KNOBS.some(k=>Math.abs(SHAPE[k[0]]-SHAPE_DEF[k[0]])>.005);$('bShape').classList.toggle('on',mod);$('bShape').querySelector('.val').textContent=mod?'tweak':'stock';
+  try{localStorage.setItem('kz-shape',JSON.stringify(SHAPE))}catch(e){}}
+function openShape(){stopPlay();$('shTitle').textContent='05 · SHAPE THE SOUND';shGrid.style.gridTemplateColumns='repeat(auto-fill,minmax(250px,1fr))';shGrid.innerHTML='';
+  KNOBS.forEach(([key,name,sub,lo,hi])=>{const el=document.createElement('label');el.className='knob';
+    el.innerHTML=`<span class="kh"><b>${name}</b><small>${sub}</small><output></output></span><input type="range" min="0" max="100" step="1" aria-label="${name}"><span class="ends"><i>${lo}</i><i>${hi}</i></span>`;
+    const inp=el.querySelector('input'),out=el.querySelector('output'),show=()=>{const v=Math.round(SHAPE[key]*100);inp.value=v;inp.style.setProperty('--p',v+'%');out.textContent=v;el.classList.toggle('mod',Math.abs(SHAPE[key]-SHAPE_DEF[key])>.005)};
+    inp.addEventListener('input',()=>{SHAPE[key]=inp.value/100;show();applyShape();syncShape()});inp.addEventListener('change',()=>{buzz(6);preview()});show();shGrid.appendChild(el)});
+  const r=document.createElement('button');r.id='shReset';r.textContent='RESET TO STOCK';r.onclick=()=>{Object.assign(SHAPE,SHAPE_DEF);applyShape();syncShape();openShape();buzz(8);preview()};shGrid.appendChild(r);
+  sheet.classList.add('open')}
+press($('bShape'),openShape);syncShape();
 
 const pointers=new Map();
 cv.addEventListener('pointerdown',e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
@@ -346,7 +370,7 @@ let started=false;
 /*UNLOCK*/
 ['pointerup','touchend','click'].forEach(ev=>document.addEventListener(ev,()=>{if(started&&(!AC||AC.state!=='running'))unlockAudio()},{passive:true}));
 $('start').addEventListener('click',e=>{e.preventDefault();unlockAudio();started=true;e.currentTarget.style.display='none';buzz(12);
-  if(AC){ds.gain.value=.26;rs.gain.value=.38}setTimeout(preview,120)});
+  applyShape();setTimeout(preview,120)});
 
 let lastT=performance.now();
 function frame(t){const dt=Math.min(3,(t-lastT)/16.667);lastT=t;recent*=Math.pow(.985,dt);

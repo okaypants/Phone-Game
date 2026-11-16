@@ -13,13 +13,14 @@ It's a single static web page with no build step, server or dependencies. All so
 - **Synths behave like the real instruments:**
   - The 808, Moog, ARP and vox are mono with legato glide (off, short or long), and fall back to the note still held when you let go.
   - Electro and strings play chords.
-  - Each synth has its own echo and reverb amount. The 808 and electro are dry.
+  - Each synth has its own echo and reverb amount (the 808 and electro start dry); the ECHO and REVERB sliders scale them, and past halfway they add echo and reverb even to the dry ones.
 - **Dream:** a dark, slow string pad that blooms open while you hold a key, with a low octave under it, a soft electric-piano tine at the start of each note and a long, reverberant tail.
 - **Glow:** a chime built only from whole-number harmonics (so it has almost no roughness), with a slow shimmer and a soft sparkle that rises up the harmonic series after each note.
 - **Click:** an optional metronome (60–160 bpm, three volume levels, accent every fourth beat). You hear it and see it (the CLICK button flashes and four beat dots step along the display), but it isn't recorded. The echo time follows its tempo.
 - **Motes:** a little dust lifts off each key you play, and the keys either side shiver. Play with a steady pulse (or in time with the click) and the dust lasts longer, warms in colour, drifts into a slow swirl and links up; lose the pulse and it sinks and fades. It's off if your phone is set to reduce motion.
 - **Hold:** with HOLD on, the sustaining synths (everything but the 808) keep ringing after you lift your finger. Tap a lit key again to stop it, or turn HOLD off to stop them all. Poly voices stack into chords; mono voices keep the last note.
-- **Greyed-out buttons:** GLIDE, HOLD and SPACE grey out when they do nothing for the current sound (GLIDE is for the mono synths, HOLD for the sustaining synths, and the 808 is always dry).
+- **Shape:** the SHAPE button opens eight sliders that work on every sound and are remembered between visits: ECHO (tape delay), REVERB (room), TONE (low-pass cutoff), EDGE (resonance), SWELL (attack), TAIL (decay and release), GRIT (drive) and WOBBLE (an LFO on the filter, in time with the click). Each change plays a short preview; RESET TO STOCK puts everything back.
+- **Greyed-out buttons:** GLIDE and HOLD grey out when they do nothing for the current sound (GLIDE is for the mono synths, HOLD for the sustaining synths).
 - **Recorder:** records the instrument's own output, not the mic. Takes are kept in the browser (IndexedDB), and you can play, save or share, and delete them.
 - **App:** installable to the home screen (PWA) and works offline once loaded.
 
@@ -70,4 +71,4 @@ Edit in `src/`, then run `python3 src/build.py`. You can also edit `index.html` 
 
 ## Ideas for next
 
-An arpeggiator, a drive control, a filter you sweep by sliding along a key, MIDI out (Web MIDI on Android and desktop), a count-in for the recorder, and a Nintendo DS homebrew port (the two-row layout maps naturally onto the touchscreen).
+An arpeggiator, a filter you sweep by sliding along a key, MIDI out (Web MIDI on Android and desktop), a count-in for the recorder, and a Nintendo DS homebrew port (the two-row layout maps naturally onto the touchscreen).
