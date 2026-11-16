@@ -22,7 +22,7 @@ It's a single static web page with no build step, server or dependencies. All so
 - **Hold:** with HOLD on, the sustaining synths keep ringing after you lift your finger. Tap a lit key again to stop it, or turn HOLD off to stop them all. Poly voices stack into chords; mono voices keep the last note.
 - **Shape:** the SHAPE button opens eight sliders that work on every sound and are remembered between visits: ECHO (tape delay), REVERB (room), TONE (low-pass cutoff), EDGE (resonance), SWELL (attack), TAIL (decay and release), GRIT (drive) and WOBBLE (an LFO on the filter, in time with the click). Each change plays a short preview; RESET TO STOCK puts everything back.
 - **Greyed-out buttons:** GLIDE and HOLD grey out when they do nothing for the current sound (GLIDE is for the mono synths, HOLD for the sustaining synths).
-- **Recorder:** records the instrument's own output, not the mic. Takes are kept in the browser (IndexedDB), and you can play, save or share, and delete them.
+- **Recorder:** records the instrument's own output, not the mic. Takes last until you close the app; play them back, and save or share the ones you want to keep.
 - **App:** installable to the home screen (PWA) and works offline once loaded.
 
 ## Run it locally

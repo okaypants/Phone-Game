@@ -263,14 +263,11 @@ const press=(el,fn)=>el.addEventListener('pointerdown',e=>{e.stopPropagation();e
 const preview=()=>{if(!AC)return;const row=rows[rows.length-1];[0,2,4].forEach((k,i)=>setTimeout(()=>{const t=row.find(t=>t.k===k);if(t){const id='pv'+i,h=noteOn(t,t.bridgeY+t.len*.8,.45,id);h&&setTimeout(()=>noteOff(h,id),220)}},i*90))};
 press($('bSound'),()=>openSheet('01 · SOUND',SOUNDS.map((so,i)=>({label:so[0],sub:SOUND_SUB[i],sw:so[1],sel:i===soundI,act:()=>{allOff();soundI=i;syncCaps()}})),120));
 // ───────── recorder: captures the instrument's own output (no mic) ─────────
-let rec=null,recChunks=[],recStart=0,recDest=null,takes=[],playing=null,tdb=null,lcdMsg='',lcdMsgT=-1e9;
+let rec=null,recChunks=[],recStart=0,recDest=null,takes=[],playing=null,lcdMsg='',lcdMsgT=-1e9;
 const fmt=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 const say=m=>{lcdMsg=m;lcdMsgT=performance.now()};
 const REC_MIME=(()=>{if(!window.MediaRecorder)return null;for(const m of['audio/webm;codecs=opus','audio/webm','audio/mp4;codecs=mp4a.40.2','audio/mp4'])try{if(MediaRecorder.isTypeSupported(m))return m}catch(e){}return''})();
-function openDB(){return new Promise(res=>{try{const r=indexedDB.open('tine-takes',1);r.onupgradeneeded=()=>r.result.createObjectStore('takes',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}})}
-async function loadTakes(){tdb=await openDB();if(!tdb)return;try{const q=tdb.transaction('takes').objectStore('takes').getAll();q.onsuccess=()=>{takes=(q.result||[]).sort((a,b)=>a.created-b.created);syncTakes()}}catch(e){}}
-const putTake=tk=>{try{tdb&&tdb.transaction('takes','readwrite').objectStore('takes').put(tk)}catch(e){}};
-const delTake=id=>{try{tdb&&tdb.transaction('takes','readwrite').objectStore('takes').delete(id)}catch(e){}};
+// takes live in memory only: they last until the app is closed, so save the ones you want
 function syncTakes(){$('bTakes').querySelector('.val').textContent=takes.length}
 function setRecUI(on){$('bRec').classList.toggle('recording',on);$('bRec').querySelector('.val').textContent=on?'0:00':'●'}
 function startRec(){if(!AC||REC_MIME===null||!masterOut)return;
@@ -281,13 +278,12 @@ function startRec(){if(!AC||REC_MIME===null||!masterOut)return;
     if(blob.size<200||dur<.4){say('too short · not kept');return}
     const n=takes.length?Math.max(...takes.map(t=>t.n||0))+1:1;
     const tk={id:Date.now()+'-'+n,n,name:'take '+String(n).padStart(2,'0'),created:Date.now(),dur,mime,blob,meta:`${SOUNDS[soundI][0]} · ${TUNE()[0]}`};
-    takes.push(tk);putTake(tk);syncTakes();say(`${tk.name} kept · ${fmt(dur)}`)};
+    takes.push(tk);syncTakes();say(`${tk.name} kept · ${fmt(dur)}`)};
   r.start(250);rec=r;recStart=performance.now();setRecUI(true)}
 function stopRec(){if(rec&&rec.state!=='inactive')rec.stop()}
 function stopPlay(){if(!playing)return;playing.a.pause();playing.btn.classList.remove('on');playing.btn.textContent='▶\uFE0E';URL.revokeObjectURL(playing.url);playing=null}
 function togglePlay(tk,btn){const same=playing&&playing.tk===tk;stopPlay();if(same)return;
   const url=URL.createObjectURL(tk.blob),a=new Audio(url);a.onended=()=>stopPlay();a.play().catch(()=>stopPlay());btn.textContent='■';btn.classList.add('on');playing={a,btn,tk,url}}
-loadTakes();
 // save: share sheet on phones, plain download elsewhere
 async function saveLocal(name,blob,mime){const file=new File([blob],name,{type:mime});
   if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
@@ -311,15 +307,16 @@ press($('bScale'),()=>openSheet('03 · SCALE',SCALE_LIST.map((sc,i)=>({label:sc[
 press($('bHold'),()=>{latch=!latch;$('bHold').classList.toggle('on',latch);$('bHold').querySelector('.val').textContent=latch?'on':'off';if(!latch)[...held.keys()].forEach(dropHeld)});
 press($('bGlide'),()=>{glideI=(glideI+1)%GLIDES.length;$('bGlide').querySelector('.val').textContent=GLIDES[glideI][0]});
 function openTakes(){stopPlay();$('shTitle').textContent=`TAKES · ${takes.length}`;shGrid.style.gridTemplateColumns='1fr';shGrid.innerHTML='';
-  if(!takes.length)shGrid.innerHTML='<div class="empty">no takes yet<br>tap REC, play, tap REC again</div>';
+  if(!takes.length)shGrid.innerHTML='<div class="empty">no takes yet<br>tap REC, play, tap REC again<br>takes clear when you close the app</div>';
   takes.slice().reverse().forEach(tk=>{const row=document.createElement('div');row.className='take';const d=new Date(tk.created);
-    row.innerHTML=`<button class="pl" aria-label="play">▶\uFE0E</button><span class="nm"><b>${tk.name}</b><small>${fmt(tk.dur)} · ${tk.meta} · ${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})} ${d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</small></span><button class="sv" aria-label="save to device">↓</button><button class="rm" aria-label="delete">×</button>`;
+    row.innerHTML=`<button class="pl" aria-label="play">▶\uFE0E</button><span class="nm"><b>${tk.name}</b><small>${fmt(tk.dur)} · ${tk.meta} · ${d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</small></span><button class="sv" aria-label="save to device">↓</button><button class="rm" aria-label="delete">×</button>`;
     const pl=row.querySelector('.pl'),rm=row.querySelector('.rm'),sv=row.querySelector('.sv');
     pl.onclick=()=>togglePlay(tk,pl);
-    rm.onclick=()=>{if(rm.dataset.armed){if(playing&&playing.tk===tk)stopPlay();takes=takes.filter(t=>t!==tk);delTake(tk.id);syncTakes();openTakes()}
+    rm.onclick=()=>{if(rm.dataset.armed){if(playing&&playing.tk===tk)stopPlay();takes=takes.filter(t=>t!==tk);syncTakes();openTakes()}
       else{rm.dataset.armed=1;rm.textContent='del?';setTimeout(()=>{if(rm.isConnected){delete rm.dataset.armed;rm.textContent='×'}},2500)}};
     sv.onclick=async()=>{const ext=/mp4/.test(tk.mime)?'mp4':'webm',name=`kalimbasizer ${tk.name}.${ext}`;try{await saveLocal(name,tk.blob,tk.mime);sv.textContent='✓'}catch(e){sv.textContent=e&&e.name==='AbortError'?'↓':'!'}};
     shGrid.appendChild(row)});
+  if(takes.length)shGrid.insertAdjacentHTML('beforeend','<div class="empty">takes clear when you close the app · ↓ saves one</div>');
   sheet.classList.add('open')}
 press($('bRec'),()=>{if(REC_MIME===null){say('rec not supported here');return}if(!AC)return;rec?stopRec():startRec()});
 press($('bTakes'),openTakes);
