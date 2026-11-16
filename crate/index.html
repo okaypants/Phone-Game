@@ -51,26 +51,33 @@ button.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 #meta b{display:block;font-size:16px;font-weight:600;line-height:1.3}
 #meta small{display:block;font-size:11px;opacity:.7;margin-top:5px;line-height:1.5}
 #meta a{color:inherit}
+#dt{height:150px}
 .wave{display:block;width:100%;border:1.4px solid var(--ink);border-radius:12px;background:#FBF8F1;touch-action:none;cursor:crosshair}
-#ov{height:64px}#dt{height:150px;margin-top:8px}
-#read{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin:8px 2px 0}
-#read span small{font-size:9px;letter-spacing:.14em;opacity:.55;font-weight:400;margin-right:5px}
 .nud{display:flex;gap:6px;align-items:center}
 .nud .btn{min-height:40px;padding:0 12px}
 .nud i{font-style:normal;font-size:9px;letter-spacing:.12em;opacity:.6;padding:0 2px}
-#prog{height:10px;border:1.4px solid var(--ink);border-radius:999px;overflow:hidden;margin:10px 0}
-#prog div{height:100%;width:0;background:var(--te)}
-#sheet{position:fixed;inset:0;z-index:4;display:none}
-#sheet.open{display:block}
-#sheet .bg{position:absolute;inset:0;background:rgba(28,28,27,.32)}
-#sheet .pane{position:absolute;left:0;right:0;bottom:0;max-width:660px;margin:0 auto;background:var(--paper);border:1.4px solid var(--ink);border-bottom:none;border-radius:22px 22px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom));max-height:86vh;overflow:auto;animation:up .16s ease-out}
+.sheet{position:fixed;inset:0;z-index:4;display:none}
+.sheet.open{display:block}
+.sheet .bg{position:absolute;inset:0;background:rgba(28,28,27,.32)}
+.sheet .pane{position:absolute;left:0;right:0;bottom:0;max-width:660px;margin:0 auto;background:var(--paper);border:1.4px solid var(--ink);border-bottom:none;border-radius:22px 22px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;animation:up .16s ease-out}
 @keyframes up{from{transform:translateY(30px);opacity:.4}}
-#sheet .hd{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px;font-size:10px;letter-spacing:.16em}
+.sheet .hd{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px;font-size:10px;letter-spacing:.16em}
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:3;max-width:660px;margin:0 auto;background:var(--paper);border:1.4px solid var(--ink);border-bottom:none;border-radius:20px 20px 0 0;padding:10px 12px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(28,28,27,.12)}
+body.docked{padding-bottom:calc(230px + env(safe-area-inset-bottom))}
+.dk1{display:flex;align-items:center;gap:10px}
+.dk1 .tx{flex:1;min-width:0}
+.dk1 b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk1 small{display:block;font-size:10px;opacity:.65;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk1 .ic{flex:0 0 38px;height:38px;border:1.4px solid var(--ink);border-radius:10px;background:transparent;font-size:13px;font-weight:600;padding:0}
+#bar{height:26px;margin:8px 0 10px;border:1.4px solid var(--ink);border-radius:999px;background:#FBF8F1;overflow:hidden;touch-action:none;cursor:pointer}
+#barF{height:100%;width:0;background:var(--te);border-right:1.4px solid var(--ink)}
+#dock .btn{padding:0;flex:0 0 50px;min-height:64px;font-size:13px}
+.card.on{background:var(--ink);color:var(--paper)}
+.card.on .tag{border-color:var(--paper)}
 .about p{font-size:12px;line-height:1.65;margin:0 2px 12px}
 .about b{font-weight:600}
-#bSamp{display:block;width:100%;min-height:92px;margin-top:14px;border:1.4px solid var(--ink);border-radius:20px;background:var(--te);box-shadow:4px 4px 0 var(--ink);font-size:17px;font-weight:600;letter-spacing:.12em;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-#bSamp.cap{background:var(--ink);color:var(--paper);transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
-#hint{font-size:11px;line-height:1.6;opacity:.7;margin:10px 2px 0;text-align:center;min-height:18px}
+#bSamp{min-height:64px;border:1.4px solid var(--ink);border-radius:16px;background:var(--te);box-shadow:3px 3px 0 var(--ink);font-size:14px;font-weight:600;letter-spacing:.1em;padding:0 6px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#bSamp.cap{background:var(--ink);color:var(--paper);transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 #fine{margin-top:16px;border-top:1.4px solid var(--ink);padding-top:4px}
 #fine summary{font-size:11px;font-weight:600;letter-spacing:.12em;padding:12px 2px;cursor:pointer}
 .empty{font-size:11px;line-height:1.7;opacity:.6;padding:18px 6px;text-align:center}
@@ -83,7 +90,7 @@ button.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
   <button class="btn sm" id="bAbout" aria-label="About">?</button>
 </header>
 
-<main id="vDig">
+<main>
   <form id="fSearch" class="row">
     <div class="grow"><input id="q" type="search" enterkeyhint="search" placeholder="blues, banjo, a title, a name…" autocomplete="off" autocapitalize="off"></div>
     <button class="btn hot" type="submit">DIG</button>
@@ -102,63 +109,52 @@ button.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
   <button class="btn" id="bMore" hidden style="width:100%">MORE</button>
 </main>
 
-<main id="vChop" hidden>
-  <div class="row" style="margin-bottom:12px"><button class="btn sm" id="bBack">← BACK TO RESULTS</button></div>
-  <div id="meta"></div>
-  <div id="loading" hidden>
-    <div id="prog"><div></div></div>
-    <div id="loadTx" style="font-size:11px;opacity:.7"></div>
+<div id="dock" hidden>
+  <div class="dk1"><div class="tx"><b id="dkT"></b><small id="dkS"></small></div><button class="ic" id="dkX" aria-label="Close player">✕</button></div>
+  <div id="bar"><div id="barF"></div></div>
+  <div class="row">
+    <button class="btn" id="bBack5" aria-label="Back 5 seconds">−5</button>
+    <button class="btn" id="bPlay" aria-label="Play or pause">▶</button>
+    <button class="btn" id="bFwd5" aria-label="Forward 5 seconds">+5</button>
+    <button id="bSamp" class="grow">HOLD TO SAMPLE</button>
   </div>
-  <div id="tracks" style="margin-top:12px"></div>
-  <div id="editor" hidden>
-    <div class="lbl">TAP THE WAVE TO JUMP AROUND</div>
-    <canvas class="wave" id="ov"></canvas>
-    <div class="row" style="margin-top:10px">
-      <button class="btn" id="bBack5">−5 s</button>
-      <button class="btn grow" id="bPlay">▶ PLAY</button>
-      <button class="btn" id="bFwd5">+5 s</button>
-    </div>
-    <button id="bSamp">HOLD TO SAMPLE</button>
-    <div id="hint"></div>
-    <div id="samp" hidden>
-      <div class="lbl">YOUR SAMPLE · <span id="rL"></span></div>
-      <div class="row">
-        <button class="btn grow" id="bSnip">▶ HEAR IT</button>
-        <button class="btn grow hot" id="bSave">SAVE WAV</button>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button class="btn grow" id="bAdd">+ ADD TO CRATE</button>
-        <button class="btn grow" id="bResume">KEEP LISTENING</button>
-      </div>
-      <div id="exTx" style="font-size:11px;opacity:.7;margin:10px 2px 0;min-height:16px"></div>
-      <details id="fine">
-        <summary>FINE-TUNE (OPTIONAL)</summary>
-        <div class="lbl">DRAG EITHER EDGE</div>
-        <canvas class="wave" id="dt"></canvas>
-        <div id="read"><span><small>START</small><b id="rS"></b></span><span><small>END</small><b id="rE"></b></span></div>
-        <div class="row" style="margin-top:10px;justify-content:space-between">
-          <div class="nud"><button class="btn" data-n="s-">◀</button><i>START</i><button class="btn" data-n="s+">▶</button></div>
-          <div class="nud"><button class="btn" data-n="e-">◀</button><i>END</i><button class="btn" data-n="e+">▶</button></div>
-        </div>
-        <div class="lbl">SET LENGTH</div>
-        <div class="row" id="lens"></div>
-        <div class="lbl">NAME AND SOUND · 16-BIT 44.1 kHz WAV</div>
-        <div class="row">
-          <div class="grow"><input id="nm" maxlength="14" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Sample name"></div>
-          <button class="btn" id="bLoop">LOOP</button>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn grow" id="bMono">MONO</button>
-          <button class="btn grow" id="bNorm">NORMALIZE</button>
-        </div>
-        <div class="lbl">CHOP INTO EQUAL SLICES</div>
-        <div class="row" id="chops"></div>
-      </details>
-    </div>
-  </div>
-</main>
+</div>
 
-<div id="sheet"><div class="bg"></div><div class="pane">
+<div id="sampSheet" class="sheet"><div class="bg"></div><div class="pane">
+  <div class="hd"><span>YOUR SAMPLE · <span id="rL"></span></span><button class="btn sm" id="spX">CLOSE</button></div>
+  <div id="meta"></div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn grow" id="bSnip">▶ HEAR IT</button>
+    <button class="btn grow hot" id="bSave">SAVE WAV</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button class="btn grow" id="bAdd">+ ADD TO CRATE</button>
+    <button class="btn grow" id="bResume">KEEP LISTENING</button>
+  </div>
+  <div id="exTx" style="font-size:11px;opacity:.7;margin:10px 2px 0;min-height:16px"></div>
+  <details id="fine">
+    <summary>FINE-TUNE (OPTIONAL)</summary>
+    <div class="lbl">DRAG EITHER EDGE</div>
+    <canvas class="wave" id="dt"></canvas>
+    <div class="row" style="margin-top:10px;justify-content:space-between">
+      <div class="nud"><button class="btn" data-n="s-">◀</button><i>START</i><button class="btn" data-n="s+">▶</button></div>
+      <div class="nud"><button class="btn" data-n="e-">◀</button><i>END</i><button class="btn" data-n="e+">▶</button></div>
+    </div>
+    <div class="lbl">NAME AND SOUND · 16-BIT 44.1 kHz WAV</div>
+    <div class="row">
+      <div class="grow"><input id="nm" maxlength="14" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Sample name"></div>
+      <button class="btn" id="bLoop">LOOP</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn grow" id="bMono">MONO</button>
+      <button class="btn grow" id="bNorm">NORMALIZE</button>
+    </div>
+    <div class="lbl">CHOP INTO EQUAL SLICES</div>
+    <div class="row" id="chops"></div>
+  </details>
+</div></div>
+
+<div id="sheet" class="sheet"><div class="bg"></div><div class="pane">
   <div class="hd"><span id="shT"></span><button class="btn sm" id="shX">CLOSE</button></div>
   <div id="shB"></div>
 </div></div>
@@ -174,7 +170,6 @@ const SRC={
   commons:{name:'WIKIMEDIA PD',note:'Wikimedia Commons files marked public domain or CC0'}
 };
 const TAGS=['blues','jazz','ragtime','piano','banjo','fiddle','orchestra','opera','choir','hawaiian','tango','march','organ','drum','whistling','yodel'];
-const LENS=[.25,.5,1,2,4,8];
 const st={src:'ia78',q:'',page:1,more:false,loop:true,mono:true,norm:true,chop:1};
 try{Object.assign(st,JSON.parse(localStorage.getItem('crate-opts')||'{}'))}catch(e){}
 if(!SRC[st.src])st.src='ia78';
@@ -207,7 +202,7 @@ async function getJSON(url,tries=3){const r=await fetch(url);
   if(!r.ok)throw new Error(r.status===429?'That library is busy. Wait a moment and try again.':'The library answered with an error ('+r.status+').');return r.json()}
 function iaQuery(q){
   // only the library digitization projects: one disc side per record, with a catalogued date. Uploads by the public are often compilations with wrong dates
-  const p=['mediatype:audio','collection:(georgeblood OR edison-recordings OR 78rpm_bostonpubliclibrary)','year:[1880 TO '+CUT+']'];
+  const p=['mediatype:audio','collection:(georgeblood OR edison-recordings OR 78rpm_bostonpubliclibrary)','year:[1880 TO '+CUT+']','NOT access-restricted-item:true']; // the Archive locks some records, so skip those
   q=q.replace(/[^\p{L}\p{N}\s'-]/gu,' ').trim();if(q)p.push('('+q+')');
   return p.join(' AND ')}
 function iaURL(q,rows,page){
@@ -219,7 +214,7 @@ async function searchIA(q,page,random){
   if(random){const n=(await getJSON(iaURL(q,0,1))).response.numFound;page=1+Math.floor(Math.random()*Math.max(1,Math.min(Math.floor(n/rows),300)))}
   const d=(await getJSON(iaURL(q,rows,page))).response;
   return {page,more:d.start+d.docs.length<Math.min(d.numFound,9990),
-    items:d.docs.map(x=>({src:'ia78',id:x.identifier,title:clean(x.title)||x.identifier,artist:clean(x.creator),year:x.year||'',
+    items:d.docs.map(x=>({src:'ia78',key:'ia:'+x.identifier,id:x.identifier,title:clean(x.title)||x.identifier,artist:clean(x.creator),year:x.year||'',
       lic:'Public domain (US)',page:'https://archive.org/details/'+encodeURIComponent(x.identifier)}))}}
 const stripHTML=h=>{const d=new DOMParser().parseFromString(h||'','text/html');return (d.body.textContent||'').replace(/\s+/g,' ').trim()};
 async function searchCommons(q,page,random){
@@ -230,14 +225,14 @@ async function searchCommons(q,page,random){
   for(const p of pages){const ii=p.imageinfo&&p.imageinfo[0];if(!ii)continue;const m=ii.extmetadata||{},lic=((m.License||{}).value||'').toLowerCase();
     if(!/^(pd|cc0)/.test(lic)||/mid/.test(ii.mime||''))continue;
     const yr=(((m.DateTimeOriginal||{}).value||'').match(/\b(1[89]|20)\d\d\b/)||[''])[0];
-    items.push({src:'commons',title:p.title.replace(/^File:/,'').replace(/\.[a-z0-9]+$/i,''),artist:stripHTML((m.Artist||{}).value).slice(0,90),year:yr,
+    items.push({src:'commons',key:'wm:'+p.pageid,title:p.title.replace(/^File:/,'').replace(/\.[a-z0-9]+$/i,''),artist:stripHTML((m.Artist||{}).value).slice(0,90),year:yr,
       lic:lic.startsWith('cc0')?'CC0':'Public domain',page:ii.descriptionurl,url:ii.url.split('?')[0],mime:ii.mime,dur:ii.duration})}
   return {page,more:!!(d.continue&&d.continue.gsroffset),items}}
 
 let searchTok=0;
 async function runSearch(more,random){
   const tok=++searchTok,stEl=$('status');
-  if(!more){st.page=1;$('results').textContent=''}else st.page++;
+  if(!more){st.page=1;$('results').textContent='';nowCard=null}else st.page++;
   $('bMore').hidden=true;stEl.className='';stEl.textContent='Digging…';
   try{
     const r=await(st.src==='ia78'?searchIA:searchCommons)(st.q,st.page,random);
@@ -254,100 +249,146 @@ function resultCard(it){
   tx.appendChild(el('b','',it.title));
   const sm=el('small');sm.appendChild(el('span','tag',it.lic.toUpperCase()));sm.appendChild(document.createTextNode(it.artist||'unknown performer'));tx.appendChild(sm);
   c.appendChild(tx);c.appendChild(el('span','yr',it.year?String(it.year):''));
-  c.onclick=()=>openItem(it);return c}
+  c.onclick=()=>openItem(it,c);return c}
 
-/* ---------- loading a recording ---------- */
-let cur=null,loadCtl=null,sel={s:0,e:2},view={s:0,e:2};
-function showView(v){$('vDig').hidden=v!=='dig';$('vChop').hidden=v!=='chop';window.scrollTo(0,0)}
+/* ---------- streaming player ---------- */
+// Songs are streamed, never fetched whole: the browser pulls only what you listen to, and nothing is kept.
+const player=new Audio();player.crossOrigin='anonymous';player.preload='none';player.setAttribute('playsinline','');
+let now=null,nowCard=null,openTok=0,primed=false,triedAlt=false;
+function primePlayer(){ // phones only let a page start sound from a tap, so claim the player during the first one
+  if(primed||now)return;primed=true;try{player.src=silentWavURL();const p=player.play();p&&p.catch(()=>{})}catch(e){}}
+['pointerup','touchend','click'].forEach(ev=>document.addEventListener(ev,primePlayer,{passive:true}));
+const tShort=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function dockMsg(t){$('dkS').textContent=t}
+function setSrc(url){player.src=url;const p=player.play();p&&p.catch(()=>{})}
+async function openItem(it,card){
+  if(now&&now.key===it.key&&!it.file){return player.paused?player.play().catch(()=>{}):player.pause()}
+  const tok=++openTok;cancelCap();closeSamp();unlockAudio();
+  try{player.pause()}catch(e){}
+  if(nowCard)nowCard.classList.remove('on');nowCard=card||null;if(card)card.classList.add('on');
+  now=Object.assign({},it);triedAlt=false;
+  $('dock').hidden=false;document.body.classList.add('docked');$('dkT').textContent=it.title;dockMsg('Loading…');$('barF').style.width='0';
+  await ensureGraph();if(tok!==openTok)return;
+  try{
+    if(it.file){now.alt=null;return setSrc(URL.createObjectURL(it.file))}
+    if(it.src==='commons'){
+      const direct=/mpeg|wav/.test(it.mime||''),nm=it.url.split('/').pop();
+      now.alt=direct?null:it.url; // browsers that cannot play the transcode get the original
+      return setSrc(direct?it.url:it.url.replace('/commons/','/commons/transcoded/')+'/'+nm+'.mp3')}
+    const d=await getJSON('https://archive.org/metadata/'+encodeURIComponent(it.id));if(tok!==openTok)return;
+    const files=(d.files||[]).filter(f=>!f.private&&f.name);
+    let au=files.filter(f=>/mp3/i.test(f.format||''));
+    if(!au.length)au=files.filter(f=>/flac|wave|ogg|vorbis/i.test(f.format||''));
+    if(!au.length)throw new Error('This record has no playable audio.');
+    const f=au.find(f=>!f.name.includes('/'))||au[0]; // extra transfers of the same side sit in subfolders
+    setSrc('https://archive.org/download/'+encodeURIComponent(it.id)+'/'+f.name.split('/').map(encodeURIComponent).join('/'))
+  }catch(e){if(tok===openTok)dockMsg(e instanceof TypeError?'Could not reach the library. Check your connection.':e.message)}}
+function closeDock(){openTok++;cancelCap();try{player.pause();player.removeAttribute('src');player.load()}catch(e){}
+  now=null;if(nowCard)nowCard.classList.remove('on');nowCard=null;$('dock').hidden=true;document.body.classList.remove('docked')}
+player.addEventListener('error',()=>{if(!now)return;
+  if(now.alt&&!triedAlt){triedAlt=true;return setSrc(now.alt)}
+  dockMsg('Could not play this recording. Try another one.');syncPlayUI()});
+player.addEventListener('waiting',()=>{if(now&&!cap)dockMsg('Loading…')});
+['play','pause','playing','ended'].forEach(ev=>player.addEventListener(ev,()=>{syncPlayUI();if(ev==='playing')tick()}));
+['play','seeking'].forEach(ev=>player.addEventListener(ev,()=>{if(!cap)chunks=[]}));
+function tick(){
+  if(!now)return;const d=player.duration,t=player.currentTime;
+  if(isFinite(d)&&d>0)$('barF').style.width=(t/d*100).toFixed(2)+'%';
+  if(cap)$('bSamp').textContent=(cap.held?'LET GO · ':'TAP TO END · ')+Math.max(0,(performance.now()-cap.t)/1000).toFixed(1)+' s';
+  else if(!player.paused&&player.readyState>2)dockMsg(tShort(t)+(isFinite(d)?' / '+tShort(d):'')+' · '+now.lic+(now.artist?' · '+now.artist:''));
+  if(!player.paused||cap)requestAnimationFrame(tick)}
+function syncPlayUI(){
+  const off=player.paused||!!player.error;$('bPlay').textContent=off?'▶':'❚❚';$('bPlay').classList.toggle('on',!off&&!!now);
+  $('bSamp').classList.toggle('cap',!!cap);if(!cap)$('bSamp').textContent='HOLD TO SAMPLE';
+  $('bSnip').textContent=snip?'■ STOP':'▶ HEAR IT';$('bSnip').classList.toggle('on',!!snip)}
+function seekTo(t){const d=player.duration;if(!now||!isFinite(d))return;cancelCap();player.currentTime=Math.max(0,Math.min(t,d-.2));tick()}
+$('bPlay').onclick=()=>{if(!now)return;if(player.paused)player.play().catch(()=>{});else{cancelCap();player.pause()}};
+$('bBack5').onclick=()=>seekTo(player.currentTime-5);$('bFwd5').onclick=()=>seekTo(player.currentTime+5);
+$('dkX').onclick=closeDock;
+
+/* ---------- live sampling: record what plays while the button is held ---------- */
+const PRE=1.5,POST=.4,MAXCAP=60; // seconds kept either side for fine-tuning, and the longest sample
+let graph=null,chunks=[],cap=null,cur=null,sel={s:0,e:1},view={s:0,e:1},hasSel=false;
+const lat=()=>AC?(AC.outputLatency||AC.baseLatency||0):0; // what you hear is this far behind the clock
+const REC_SRC=`class R extends AudioWorkletProcessor{constructor(){super();this.n=2048;this.l=new Float32Array(this.n);this.r=new Float32Array(this.n);this.i=0;this.f=0}
+process(inp){const c=inp[0],a=c&&c[0],b=c&&(c[1]||c[0]);if(this.i===0)this.f=currentFrame;
+for(let k=0;k<128;k++){this.l[this.i]=a?a[k]:0;this.r[this.i]=b?b[k]:0;this.i++}
+if(this.i>=this.n){this.port.postMessage({l:this.l,r:this.r,n0:this.f});this.l=new Float32Array(this.n);this.r=new Float32Array(this.n);this.i=0}return true}}
+registerProcessor('rec',R)`;
+function ensureGraph(){
+  if(graph)return graph;
+  return graph=(async()=>{
+    initAudio();const src=AC.createMediaElementSource(player);src.connect(AC.destination);
+    try{
+      await AC.audioWorklet.addModule(URL.createObjectURL(new Blob([REC_SRC],{type:'application/javascript'})));
+      const n=new AudioWorkletNode(AC,'rec',{numberOfInputs:1,numberOfOutputs:0,channelCount:2,channelCountMode:'explicit'});
+      n.port.onmessage=ev=>onChunk(ev.data.l,ev.data.r,ev.data.n0);src.connect(n)
+    }catch(e){ // older browsers
+      const n=AC.createScriptProcessor(2048,2,2),z=AC.createGain();z.gain.value=0;
+      n.onaudioprocess=ev=>{const b=ev.inputBuffer;onChunk(new Float32Array(b.getChannelData(0)),new Float32Array(b.getChannelData(1)),Math.round(ev.playbackTime*AC.sampleRate))};
+      src.connect(n);n.connect(z);z.connect(AC.destination)}
+  })().catch(()=>{})}
+function onChunk(l,r,n0){
+  if(!now||(player.paused&&!cap))return;
+  if(chunks.length&&n0!==chunks[chunks.length-1].n0+chunks[chunks.length-1].l.length&&!cap)chunks=[];
+  chunks.push({l,r,n0});
+  const sr=AC.sampleRate,end=n0+l.length;
+  if(!cap){while(chunks.length>1&&end-chunks[1].n0>PRE*sr)chunks.shift();return}
+  if(cap.e!=null){if(end>=cap.until)finishCap()}
+  else if(end-cap.n>MAXCAP*sr)endCap()}
+function capDown(){
+  if(!now)return;
+  if(cap){if(cap.e==null)endCap();return}
+  unlockAudio();
+  if(player.paused){chunks=[];player.play().catch(()=>{})}
+  cap={n:Math.round((AC.currentTime-lat())*AC.sampleRate),tt:player.currentTime,t:performance.now(),held:true,e:null};
+  syncPlayUI();tick()}
+function capUp(){if(!cap||!cap.held||cap.e!=null)return;cap.held=false;if(performance.now()-cap.t<250)return;endCap()}
+function endCap(){ // keep recording a moment longer so there is room to move the end later
+  const sr=AC.sampleRate;cap.e=Math.round((AC.currentTime-lat())*sr);cap.until=AC.currentTime*sr+POST*sr;
+  cap.timer=setTimeout(finishCap,POST*1000+500)}
+function cancelCap(){if(cap){clearTimeout(cap.timer);cap=null;syncPlayUI()}}
+function finishCap(){
+  if(!cap)return;const c=cap;clearTimeout(c.timer);cap=null;
+  const sr=AC.sampleRate,first=chunks.length?chunks[0].n0:0,n=chunks.reduce((a,k)=>a+k.l.length,0);
+  const s=Math.max(0,(c.n-first)/sr),e=Math.min(n/sr,(c.e-first)/sr);
+  if(!n||e-s<.03){syncPlayUI();return}
+  const buf=AC.createBuffer(2,n,sr),L=buf.getChannelData(0),R=buf.getChannelData(1);let o=0;
+  for(const k of chunks){L.set(k.l,o);R.set(k.r,o);o+=k.l.length}
+  chunks=[];player.pause();
+  cur=Object.assign({},now,{buf,dur:n/sr,t0:c.tt-s});hasSel=true;
+  $('nm').value=akaiName(now.title);setMeta(now);
+  $('sampSheet').classList.add('open');setSel(s,e,true);playSnip()}
+(b=>{let id=null;
+  b.addEventListener('pointerdown',ev=>{id=ev.pointerId;try{b.setPointerCapture(id)}catch(e){}ev.preventDefault();capDown()});
+  const up=ev=>{if(ev.pointerId===id){id=null;capUp()}};
+  b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
+  b.addEventListener('contextmenu',ev=>ev.preventDefault())})($('bSamp'));
+(b=>{let id=null;const go=ev=>{const r=b.getBoundingClientRect();seekTo(Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width))*player.duration)};
+  b.addEventListener('pointerdown',ev=>{id=ev.pointerId;try{b.setPointerCapture(id)}catch(e){}go(ev)});
+  b.addEventListener('pointermove',ev=>{if(ev.pointerId===id)go(ev)});
+  const up=ev=>{if(ev.pointerId===id)id=null};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up)})($('bar'));
+
+/* ---------- the captured sample ---------- */
 function setMeta(it){
   const m=$('meta');m.textContent='';m.appendChild(el('b','',it.title));
   const sm=el('small');sm.appendChild(el('span','tag',it.lic.toUpperCase()));
   sm.appendChild(document.createTextNode([it.artist,it.year].filter(Boolean).join(' · ')+' '));
   if(it.page){const a=el('a','','source page ↗');a.href=it.page;a.target='_blank';a.rel='noopener';sm.appendChild(a)}
   m.appendChild(sm)}
-async function openItem(it){
-  stopPlay();cancelLoad();cur=null;
-  showView('chop');setMeta(it);$('editor').hidden=true;$('tracks').textContent='';$('loading').hidden=true;
-  try{
-    if(it.file){return await loadAudio(it,()=>it.file.arrayBuffer())}
-    if(it.src==='commons'){
-      const direct=/mpeg|wav/.test(it.mime||''),nm=it.url.split('/').pop();
-      const mp3=it.url.replace('/commons/','/commons/transcoded/')+'/'+nm+'.mp3';
-      return await loadAudio(it,p=>direct?fetchBytes(it.url,p):fetchBytes(mp3,p).catch(e=>{if(e.name==='AbortError')throw e;return fetchBytes(it.url,p)}))}
-    loadMsg('Looking up the record…',0);
-    const ctl=loadCtl=new AbortController(),r=await fetch('https://archive.org/metadata/'+encodeURIComponent(it.id),{signal:ctl.signal});
-    const d=await r.json(),files=(d.files||[]).filter(f=>!f.private&&f.name);
-    let au=files.filter(f=>/mp3/i.test(f.format||''));
-    if(!au.length)au=files.filter(f=>/flac|wave|ogg|vorbis/i.test(f.format||''));
-    $('loading').hidden=true;
-    if(!au.length)throw new Error('This record has no playable audio file.');
-    const pick=f=>loadAudio(Object.assign({},it,{title:au.length>1&&f.title?f.title:it.title,fileName:f.name}),
-      p=>fetchBytes('https://archive.org/download/'+encodeURIComponent(it.id)+'/'+f.name.split('/').map(encodeURIComponent).join('/'),p));
-    const top=au.filter(f=>!f.name.includes('/')); // extra transfers of the same side sit in subfolders
-    if(top.length===1)return await pick(top[0]);
-    const tr=$('tracks');tr.appendChild(el('div','lbl',au.length+' RECORDINGS ON THIS RECORD · PICK ONE'));
-    au.slice(0,80).forEach(f=>{const c=el('button','card'),tx=el('div','tx');c.type='button';tx.appendChild(el('b','',f.title||f.name));
-      tx.appendChild(el('small','',f.name));c.appendChild(tx);c.appendChild(el('span','yr',lenTx(f.length)));
-      c.onclick=()=>{tr.textContent='';pick(f).catch(loadFail)};tr.appendChild(c)})
-  }catch(e){loadFail(e)}}
-const lenTx=l=>!l?'':/:/.test(l)?l:fmtT(+l).split('.')[0];
-function loadFail(e){if(e&&e.name==='AbortError')return;$('loading').hidden=false;$('prog').hidden=true;
-  $('loadTx').textContent=e instanceof TypeError?'Could not load this recording. Check your connection, or try another one.':(e&&e.message)||'Could not open this recording.'}
-function loadMsg(t,f){$('loading').hidden=false;$('prog').hidden=false;$('loadTx').textContent=t;$('prog').firstElementChild.style.width=Math.round(f*100)+'%'}
-function cancelLoad(){if(loadCtl){loadCtl.abort();loadCtl=null}}
-async function fetchBytes(url,onProg){
-  const ctl=loadCtl=new AbortController(),r=await fetch(url,{signal:ctl.signal});
-  if(!r.ok)throw new Error('Could not load this recording ('+r.status+').');
-  const total=+r.headers.get('content-length')||0;
-  if(!r.body||!r.body.getReader)return r.arrayBuffer();
-  const rd=r.body.getReader(),chunks=[];let n=0;
-  for(;;){const {done,value}=await rd.read();if(done)break;chunks.push(value);n+=value.length;onProg(total?n/total:0,n)}
-  const out=new Uint8Array(n);let o=0;for(const c of chunks){out.set(c,o);o+=c.length}
-  return out.buffer}
-async function loadAudio(it,getBytes){
-  setMeta(it);loadMsg('Loading…',0);
-  const bytes=await getBytes((f,n)=>loadMsg('Loading…',f));
-  loadMsg('Almost ready…',1);
-  initAudio();
-  let buf;
-  try{buf=await new Promise((ok,no)=>{const p=AC.decodeAudioData(bytes,ok,no);if(p&&p.catch)p.catch(no)})}
-  catch(e){throw new Error('This browser cannot decode that audio format. Try another recording.')}
-  cur=Object.assign({},it,{buf,dur:buf.duration,peaks:makePeaks(buf,1400)});
-  $('loading').hidden=true;$('editor').hidden=false;
-  $('nm').value=akaiName(it.title);
-  hasSel=false;cap=null;cursor=0;$('samp').hidden=true;$('fine').open=false;
-  startPlay('track',0)}
-function makePeaks(buf,n){
-  const a=buf.getChannelData(0),b=buf.numberOfChannels>1?buf.getChannelData(1):null,pk=new Float32Array(n),per=a.length/n,step=Math.max(1,Math.floor(per/400));
-  for(let i=0;i<n;i++){let m=0;const i0=Math.floor(i*per),i1=Math.min(a.length,Math.floor((i+1)*per));
-    for(let j=i0;j<i1;j+=step){let v=a[j];if(v<0)v=-v;if(v>m)m=v;if(b){v=b[j];if(v<0)v=-v;if(v>m)m=v}}pk[i]=m}
-  return pk}
 const akaiName=t=>(String(t).normalize('NFD').replace(/[^\x20-\x7e]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,'').slice(0,12))||'SAMPLE';
-
-/* ---------- selection + drawing ---------- */
 const MINLEN=.02;
 function setSel(s,e,refit){
   if(!cur)return;
   s=Math.max(0,Math.min(s,cur.dur-MINLEN));e=Math.max(s+MINLEN,Math.min(e,cur.dur));
-  sel={s,e};if(refit)fitView();
-  $('rS').textContent=fmtT(s);$('rE').textContent=fmtT(e);$('rL').textContent=(e-s).toFixed(2)+' SECONDS';
-  document.querySelectorAll('#lens .chip').forEach(c=>c.classList.toggle('on',Math.abs(+c.dataset.l-(e-s))<.0005));
+  sel={s,e};if(refit)view={s:0,e:cur.dur};
+  $('rL').textContent=(e-s).toFixed(2)+' SECONDS';
   draw();updateExportTx()}
-function fitView(){const len=sel.e-sel.s,pad=Math.max(.05,len*.3);view={s:Math.max(0,sel.s-pad),e:Math.min(cur.dur,sel.e+pad)}}
 function sizeCanvas(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1,w=Math.round(r.width*d),h=Math.round(r.height*d);
   if(c.width!==w||c.height!==h){c.width=w;c.height=h}return c.getContext('2d')}
 let drawQ=false;
-function draw(){if(drawQ)return;drawQ=true;requestAnimationFrame(()=>{drawQ=false;if(cur&&!$('editor').hidden){drawOv();drawDt()}})}
+function draw(){if(drawQ)return;drawQ=true;requestAnimationFrame(()=>{drawQ=false;if(cur)drawDt()})}
 const INK='#1C1C1B',TE='#FF6A2B';
-function drawOv(){
-  const c=$('ov'),g=sizeCanvas(c),W=c.width,H=c.height,pk=cur.peaks,n=pk.length;
-  g.clearRect(0,0,W,H);
-  const ph=playPos(),at=ph==null?cursor:ph,rs=cap?cap.s:sel.s,re=cap?at:sel.e,x0=rs/cur.dur*W,x1=re/cur.dur*W,box=cap||hasSel;
-  if(box){g.fillStyle='rgba(255,106,43,.45)';g.fillRect(x0,0,Math.max(3,x1-x0),H)}
-  g.fillStyle=INK;
-  for(let x=0;x<W;x++){const v=pk[Math.min(n-1,Math.floor(x/W*n))],h=Math.max(1,v*H*.92);g.fillRect(x,(H-h)/2,1,h)}
-  if(box){g.fillStyle=TE;g.fillRect(x0-1,0,2,H);g.fillRect(x1-1,0,2,H)}
-  g.fillStyle=TE;g.fillRect(at/cur.dur*W-2,0,4,H);g.fillStyle=INK;g.fillRect(at/cur.dur*W-1,0,2,H)}
 function drawDt(){
   const c=$('dt');if(!hasSel||!$('fine').open)return;
   const g=sizeCanvas(c),W=c.width,H=c.height,buf=cur.buf,a=buf.getChannelData(0),sr=buf.sampleRate,d=window.devicePixelRatio||1;
@@ -361,78 +402,35 @@ function drawDt(){
     if(lo>hi)continue;const y0=(1-hi)*H/2,y1=(1-lo)*H/2;g.fillRect(x,y0,1,Math.max(1,y1-y0))}
   g.fillStyle=TE;
   [[x0,1],[x1,-1]].forEach(([x,dir])=>{g.fillRect(x-1.5*d,0,3*d,H);g.fillRect(dir>0?x:x-12*d,0,12*d,16*d);g.fillRect(dir>0?x:x-12*d,H-16*d,12*d,16*d)});
-  const ph=playPos();if(ph!=null&&ph>=view.s&&ph<=view.e){g.fillStyle=INK;g.fillRect(tx(ph)-d,0,2*d,H)}}
-
+  const ph=snipPos();if(ph!=null){g.fillStyle=INK;g.fillRect(tx(ph)-d,0,2*d,H)}}
 function dragOn(c,fn,done){
   let id=null;const at=ev=>{const r=c.getBoundingClientRect();return Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width))};
   c.addEventListener('pointerdown',ev=>{if(!cur)return;id=ev.pointerId;try{c.setPointerCapture(id)}catch(e){}fn(at(ev),true);ev.preventDefault()});
   c.addEventListener('pointermove',ev=>{if(ev.pointerId===id)fn(at(ev),false)});
   const up=ev=>{if(ev.pointerId===id){id=null;done&&done()}};
   c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up)}
-dragOn($('ov'),(f,first)=>{if(first){cap=null;stopPlay()}cursor=f*cur.dur;draw()},()=>startPlay('track'));
 let grab='s';
 dragOn($('dt'),(f,first)=>{const t=view.s+f*(view.e-view.s);
   if(first)grab=Math.abs(t-sel.s)<=Math.abs(t-sel.e)?'s':'e';
-  if(grab==='s')setSel(Math.min(t,sel.e-MINLEN),sel.e);else setSel(sel.s,Math.max(t,sel.s+MINLEN))},()=>{fitView();draw();replay()});
+  if(grab==='s')setSel(Math.min(t,sel.e-MINLEN),sel.e);else setSel(sel.s,Math.max(t,sel.s+MINLEN))},()=>replay());
 window.addEventListener('resize',draw);
-
-/* ---------- playback + sampling ---------- */
-let play=null,cursor=0,hasSel=false,cap=null;
-const HINT='Hold the button while the part you want plays, then let go.';
-const lat=()=>AC?(AC.outputLatency||AC.baseLatency||0):0; // what you hear is this far behind the clock
-function stopPlay(){
-  if(play){const p=play;if(p.mode==='track')cursor=playPos();play=null;try{p.node.onended=null;p.node.stop()}catch(e){}}
-  syncPlayUI();draw()}
-function startPlay(mode,from){
-  if(!cur)return;stopPlay();unlockAudio();
+let snip=null;
+function stopSnip(){if(snip){const p=snip;snip=null;try{p.node.onended=null;p.node.stop()}catch(e){}}syncPlayUI();draw()}
+function playSnip(){
+  if(!cur)return;stopSnip();unlockAudio();
   const node=AC.createBufferSource();node.buffer=cur.buf;node.connect(AC.destination);
-  const p={node,mode,t0:AC.currentTime+.02,loop:mode==='snip'&&st.loop};
-  if(mode==='snip'){p.s=sel.s;p.e=sel.e;
-    if(p.loop){node.loop=true;node.loopStart=p.s;node.loopEnd=p.e;node.start(p.t0,p.s)}else node.start(p.t0,p.s,p.e-p.s)}
-  else{if(from==null)from=cursor;if(from>=cur.dur-.05)from=0;p.s=from;p.e=cur.dur;node.start(p.t0,from)}
-  node.onended=()=>{if(play!==p)return;play=null;if(mode==='track'){cursor=0;if(cap)endCap(cur.dur)}syncPlayUI();draw()};
-  play=p;syncPlayUI();tick()}
-function playPos(){
-  if(!play||!cur)return null;const t=Math.max(0,AC.currentTime-play.t0);
-  if(play.loop)return play.s+t%(play.e-play.s);
-  return Math.min(play.s+t,play.e)}
-function tick(){if(!play)return;if(cap)$('hint').textContent='Sampling… '+Math.max(0,playPos()-cap.s).toFixed(1)+' s';drawQ=false;draw();requestAnimationFrame(tick)}
-function replay(){if(play&&play.mode==='snip')startPlay('snip')}
-function syncPlayUI(){
-  const m=play&&play.mode;
-  $('bPlay').textContent=m==='track'?'❚❚ PAUSE':'▶ PLAY';$('bPlay').classList.toggle('on',m==='track');
-  $('bSnip').textContent=m==='snip'?'■ STOP':'▶ HEAR IT';$('bSnip').classList.toggle('on',m==='snip');
-  $('bSamp').classList.toggle('cap',!!cap);
-  $('bSamp').textContent=cap?(cap.held?'LET GO TO FINISH':'TAP TO FINISH'):hasSel?'HOLD TO SAMPLE AGAIN':'HOLD TO SAMPLE';
-  if(!cap)$('hint').textContent=HINT}
-function jump(d){const was=play&&play.mode==='track';cap=null;stopPlay();cursor=Math.max(0,Math.min(cursor+d,cur.dur-.05));if(was)startPlay('track');else draw()}
-// sampling: hold the button for the part you want. A quick tap starts it instead, and a second tap ends it
-function capDown(){
-  if(!cur)return;
-  if(cap){const t=playPos();return endCap(t==null?null:t-lat())}
-  let s;
-  if(play&&play.mode==='track')s=Math.max(0,playPos()-lat());else{startPlay('track');s=play.s}
-  cap={s,t:performance.now(),held:true};syncPlayUI()}
-function capUp(){
-  if(!cap||!cap.held)return;cap.held=false;
-  if(performance.now()-cap.t<250)return syncPlayUI();
-  const t=playPos();endCap(t==null?null:t-lat())}
-function endCap(e){
-  const s=cap.s;cap=null;
-  if(e==null||e-s<.03){syncPlayUI();draw();return}
-  hasSel=true;$('samp').hidden=false;setSel(s,e,true);startPlay('snip');
-  $('samp').scrollIntoView({block:'nearest',behavior:'smooth'})}
-(b=>{let id=null;
-  b.addEventListener('pointerdown',ev=>{id=ev.pointerId;try{b.setPointerCapture(id)}catch(e){}ev.preventDefault();capDown()});
-  const up=ev=>{if(ev.pointerId===id){id=null;capUp()}};
-  b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
-  b.addEventListener('contextmenu',ev=>ev.preventDefault())})($('bSamp'));
-$('bPlay').onclick=()=>{if(play&&play.mode==='track'){cap=null;stopPlay()}else startPlay('track')};
-$('bBack5').onclick=()=>jump(-5);$('bFwd5').onclick=()=>jump(5);
-$('bSnip').onclick=()=>play&&play.mode==='snip'?stopPlay():startPlay('snip');
-$('bResume').onclick=()=>{cursor=sel.e;startPlay('track')};
+  const p={node,t0:AC.currentTime+.02,s:sel.s,e:sel.e,loop:st.loop};
+  if(p.loop){node.loop=true;node.loopStart=p.s;node.loopEnd=p.e;node.start(p.t0,p.s)}else node.start(p.t0,p.s,p.e-p.s);
+  node.onended=()=>{if(snip===p){snip=null;syncPlayUI();draw()}};
+  snip=p;syncPlayUI();(function f(){if(snip!==p)return;drawQ=false;draw();requestAnimationFrame(f)})()}
+function snipPos(){if(!snip)return null;const t=Math.max(0,AC.currentTime-snip.t0);return snip.loop?snip.s+t%(snip.e-snip.s):Math.min(snip.s+t,snip.e)}
+function replay(){if(snip)playSnip()}
+function closeSamp(){stopSnip();$('sampSheet').classList.remove('open')}
+$('bSnip').onclick=()=>snip?stopSnip():playSnip();
+$('bResume').onclick=()=>{closeSamp();if(now)player.play().catch(()=>{})};
+$('spX').onclick=closeSamp;$('sampSheet').querySelector('.bg').onclick=closeSamp;
 $('bLoop').onclick=()=>{st.loop=!st.loop;saveOpts();syncOpts();replay()};
-$('fine').addEventListener('toggle',()=>{if(cur&&hasSel){fitView();draw()}});
+$('fine').addEventListener('toggle',draw);
 
 /* ---------- export ---------- */
 function renderSel(s,e,gain){
@@ -461,7 +459,7 @@ async function toWav(r){
   let o=44;for(let i=0;i<n;i++)for(let c=0;c<chs;c++){let x=out[c][i];x=x>1?1:x<-1?-1:x;v.setInt16(o,Math.round(x*32767),true);o+=2}
   return new Uint8Array(ab)}
 const baseName=()=>($('nm').value.toUpperCase().replace(/[^A-Z0-9_-]+/g,'').slice(0,14))||'SAMPLE';
-const creditOf=(name,s,e)=>name+'.WAV — "'+cur.title+'"'+(cur.artist?', '+cur.artist:'')+(cur.year?' ('+cur.year+')':'')+' — '+fmtT(s)+' to '+fmtT(e)+' — '+cur.lic+(cur.page?' — '+cur.page:'');
+const creditOf=(name,s,e)=>name+'.WAV — "'+cur.title+'"'+(cur.artist?', '+cur.artist:'')+(cur.year?' ('+cur.year+')':'')+' — '+fmtT(cur.t0+s)+' to '+fmtT(cur.t0+e)+' — '+cur.lic+(cur.page?' — '+cur.page:'');
 async function makeSlices(){
   const n=st.chop,g=peakGain(sel.s,sel.e),base=baseName(),len=(sel.e-sel.s)/n,res=[];
   for(let i=0;i<n;i++){const s=sel.s+i*len,e=s+len,name=n>1?base+String(i+1).padStart(2,'0'):base;
@@ -506,7 +504,7 @@ function zip(files){
 /* ---------- crate + about sheets ---------- */
 let prevEl=null;
 function stopPrev(){if(prevEl){prevEl.pause();URL.revokeObjectURL(prevEl.src);prevEl=null}}
-function openSheet(title,body){$('shT').textContent=title;$('shB').textContent='';$('shB').appendChild(body);$('sheet').classList.add('open')}
+function openSheet(title,body){closeSamp();$('shT').textContent=title;$('shB').textContent='';$('shB').appendChild(body);$('sheet').classList.add('open')}
 function closeSheet(){stopPrev();$('sheet').classList.remove('open')}
 $('shX').onclick=closeSheet;$('sheet').querySelector('.bg').onclick=closeSheet;
 function syncCrate(){$('bCrate').textContent='CRATE '+crate.length;if($('sheet').classList.contains('open')&&$('shT').textContent.startsWith('CRATE'))showCrate()}
@@ -527,7 +525,7 @@ function showCrate(){
 $('bCrate').onclick=showCrate;
 $('bAbout').onclick=()=>{const b=el('div','about');b.innerHTML=
   '<p><b>What this is.</b> A way to find old recordings that are free to use, grab a short piece of one, and save it as a WAV file your sampler can load.</p>'+
-  '<p><b>How to sample.</b> Tap a record and it starts playing. Hold HOLD TO SAMPLE while the part you want plays and let go when it ends. Your sample then loops so you can hear it; tap SAVE WAV to keep it, or hold the button again for another go. Nothing is saved to your phone until you tap SAVE.</p>'+
+  '<p><b>How to sample.</b> Tap a record in the list and it plays, streamed like a radio; the song itself is never downloaded or stored. Hold HOLD TO SAMPLE while the part you want plays and let go when it ends. Only that part is captured. It loops so you can hear it; tap SAVE WAV to keep it, or close it and hold the button again for another go. Nothing lands on your phone until you tap SAVE.</p>'+
   '<p><b>Getting it onto an Akai.</b> Files are 16-bit, 44.1 kHz WAV, which every MPC and S-series sampler reads. Copy them to the SD card, CF card or USB drive your sampler uses. Names are kept to 16 characters, capitals and digits, for older machines. Or do it the old way: run a cable from the headphone jack into the sampler\'s input, turn LOOP off under FINE-TUNE, and record while the sample plays.</p>'+
   '<p><b>78s to '+CUT+'.</b> In the United States, sound recordings published in '+CUT+' or earlier are in the public domain, and one more year joins them each 1 January. These results are discs and cylinders that libraries digitized for the Internet Archive (the Great 78 Project, the Edison collection and Boston Public Library), filtered by the catalogued date. A date is occasionally wrong, so check the source page before a release.</p>'+
   '<p><b>Wikimedia PD.</b> Files on Wikimedia Commons that are marked public domain or CC0. Each one links to its page, which says why it is free.</p>'+
@@ -543,8 +541,6 @@ function syncOpts(){
   chips($('tags'),TAGS,t=>t,t=>t===st.q,t=>{st.q=t;$('q').value=t;syncOpts();runSearch()});
   chips($('chops'),[1,2,4,8,16],n=>n===1?'OFF':'×'+n,n=>n===st.chop,n=>{st.chop=n;saveOpts();syncOpts();updateExportTx()});
   $('bLoop').classList.toggle('on',st.loop);$('bMono').classList.toggle('on',st.mono);$('bNorm').classList.toggle('on',st.norm)}
-LENS.forEach(l=>{const c=el('button','chip',l<1?l*1000+' ms':l+' s');c.type='button';c.dataset.l=l;
-  c.onclick=()=>{if(!cur)return;const len=Math.min(l,cur.dur),s=Math.min(sel.s,cur.dur-len);setSel(s,s+len,true);replay()};$('lens').appendChild(c)});
 document.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{const k=b.dataset.n,d=(k[1]==='+'?1:-1)*.01;
   if(k[0]==='s')setSel(Math.max(0,Math.min(sel.s+d,sel.e-MINLEN)),sel.e,true);else setSel(sel.s,Math.max(sel.s+MINLEN,sel.e+d),true);replay()});
 $('bMono').onclick=()=>{st.mono=!st.mono;saveOpts();syncOpts();updateExportTx()};
@@ -552,13 +548,12 @@ $('bNorm').onclick=()=>{st.norm=!st.norm;saveOpts();syncOpts()};
 $('fSearch').onsubmit=ev=>{ev.preventDefault();st.q=$('q').value.trim();$('q').blur();syncOpts();runSearch()};
 $('bMore').onclick=()=>runSearch(true);
 $('bRandom').onclick=()=>runSearch(false,true);
-$('bBack').onclick=()=>{cap=null;stopPlay();cancelLoad();showView('dig')};
 $('bFile').onclick=()=>$('file').click();
 $('file').onchange=()=>{const f=$('file').files[0];$('file').value='';if(!f)return;
-  openItem({src:'file',file:f,title:f.name.replace(/\.[a-z0-9]+$/i,''),artist:'',year:'',lic:'Your own file',page:''})};
-document.addEventListener('visibilitychange',()=>{if(document.hidden){cap=null;stopPlay()}});
+  openItem({src:'file',key:'file',file:f,title:f.name.replace(/\.[a-z0-9]+$/i,''),artist:'',year:'',lic:'Your own file',page:''})};
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelCap();stopSnip()}});
 syncOpts();
-$('status').textContent='Pick a word, or tap RANDOM PAGE. Everything here is public domain; tap ? for what that means.';
+$('status').textContent='Pick a word, or tap RANDOM PAGE. Tap a record to play it, then hold HOLD TO SAMPLE.';
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('../sw.js').catch(()=>{});
 </script>
 </body>
