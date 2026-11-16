@@ -26,16 +26,18 @@ It's a single static web page with no build step, server or dependencies. All so
 - **Recorder:** records the instrument's own output, not the mic. Takes last until you close the app; play them back, and save or share the ones you want to keep.
 - **App:** installable to the home screen (PWA) and works offline once loaded.
 
-## The Sampler’s Compendium (in `crate/`)
+## The Crates (in `crate/`)
 
-A second, separate page for finding old recordings that are free to sample, cutting short snippets out of them and saving WAV files for an Akai sampler (or any other). Open `crate/index.html`, or `/crate/` once hosted.
+A second, separate page over shelves of old recordings that are free to use. It has two halves, switched at the top: LISTEN, a plain player, and SAMPLE, for grabbing short snippets as WAV files for an Akai sampler (or any other). Open `crate/index.html`, or `/crate/` once hosted; `/crate/#listen` and `/crate/#sample` open either half directly.
 
-- **Sources:** 78rpm discs and cylinders that libraries digitized for the Internet Archive, limited to recordings old enough to be public domain in the US (published 101 or more years ago; the cutoff year moves on by itself each January), and Wikimedia Commons audio marked public domain or CC0. OPEN MY FILE loads audio you already have.
+- **Sources:** 78rpm discs and cylinders that libraries digitized for the Internet Archive, limited to recordings old enough to be public domain in the US (published 101 or more years ago; the cutoff year moves on by itself each January), and Wikimedia Commons audio marked public domain or CC0. OPEN MY FILE plays audio you already have.
 - **Dig:** search by word, tap a quick-dig tag, or pull a random page.
-- **Sample:** tap a record in the list and it plays in a player at the bottom of the screen. Songs are streamed, never downloaded whole or stored. Hold the HOLD TO SAMPLE button while the part you want plays and let go when it ends (or tap once to start and again to finish); only that part is captured. The sample loops so you can hear it, and SAVE WAV keeps it.
+- **Listen:** tap a record and it plays in a player at the bottom of the screen; when it ends, the next one starts. ⏮ and ⏭ change record, the bar seeks, and lock-screen controls work.
+- **Skim (both halves):** plays a few seconds, hops ahead, and moves on to the next record, for scanning a pile of records hands-free.
+- **Sample:** hold HOLD TO SAMPLE while the part you want plays and let go when it ends (or tap once to start and again to finish). Only that part is captured. The sample loops so you can hear it; SAVE WAV keeps it, and + KEEP sets it aside to save as a batch.
 - **Fine-tune (optional):** drag the sample's edges in a close-up (there is about a second of extra audio either side) or nudge them by 10 ms.
-- **Export:** 16-bit 44.1 kHz WAV, mono or stereo, optionally normalized, with 2 ms fades so slices don't click. Names are capitals and digits, 16 characters at most, for older samplers. CHOP splits the snippet into 2, 4, 8 or 16 equal slices, saved as a zip.
-- **Crate:** collect snippets and save them all as one zip. Every zip includes a `CREDITS.TXT` with the recording, timing and source page of each snippet. The crate lasts until you close the app.
+- **Export:** 16-bit 44.1 kHz WAV, mono or stereo, optionally normalized, with 2 ms fades so slices don't click. Names are capitals and digits, 16 characters at most, for older samplers. CHOP splits a sample into 2, 4, 8 or 16 equal slices, saved as a zip. Every zip includes a `CREDITS.TXT` with the recording, timing and source page of each snippet.
+- **Light on the phone:** records are streamed, never downloaded whole, and nothing is stored beyond your settings. LISTEN uses the browser's plain audio player; the recording engine only starts in SAMPLE. Search answers are remembered for the session so going back costs no request. Kept snippets live in memory until the app closes.
 - **Not included on purpose:** copyrighted music. A short sample is not automatically fair use, so the app only searches public-domain sources.
 
 ## Run it locally
@@ -62,7 +64,7 @@ Once it's hosted, phone users can use "Add to Home Screen" to get a full-screen 
 index.html               ← the whole app (this is what you deploy)
 manifest.webmanifest     ← home-screen install info
 sw.js                    ← offline cache
-crate/                   ← The Sampler’s Compendium: one self-contained index.html, plus its icon and manifest
+crate/                   ← The Crates: one self-contained index.html, plus its icon and manifest
 icon-*.png               ← app icons
 src/                     ← editable pieces that build into index.html
   index.template.html    ← UI, layout, input, recorder
