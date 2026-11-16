@@ -1,6 +1,6 @@
 # Kalimbasizer
 
-A thumb-friendly, kalimba-style instrument for your phone. The kalimba is the interface, but the sounds go well past it: five plucked voices (wood, felt, music box, metal, glow) and seven synth voices (dream pad, 808, Moog-style ladder bass, ARP-style lead, electro square, string machine, formant vox). It has a recorder built in.
+A thumb-friendly, kalimba-style instrument for your phone. The kalimba is the interface, but the sounds go well past it: four plucked voices (wood, felt, music box, metal) and eight synth voices (dream pad, haze choir pad, deep sub bass, Moog-style ladder bass, ARP-style lead, electro square, string machine, formant vox). It has a recorder built in.
 
 It's a single static web page with no build step, server or dependencies. All sound is synthesized live with the Web Audio API, so it uses no samples.
 
@@ -11,14 +11,15 @@ It's a single static web page with no build step, server or dependencies. All so
 - **Key and scale:** all 12 keys × 16 scales (major, natural minor and the other modes, harmonic and melodic minor, pentatonics, blues, in-sen, hirajoshi, whole tone, chromatic).
 - **Octave:** −3 to +2.
 - **Synths behave like the real instruments:**
-  - The 808, Moog, ARP and vox are mono with legato glide (off, short or long), and fall back to the note still held when you let go.
-  - Electro and strings play chords.
-  - Each synth has its own echo and reverb amount (the 808 and electro start dry); the ECHO and REVERB sliders scale them, and past halfway they add echo and reverb even to the dry ones.
+  - Deep, Moog, ARP and vox are mono with legato glide (off, short or long), and fall back to the note still held when you let go.
+  - Dream, haze, electro and strings play chords.
+  - Each synth has its own echo and reverb amount (deep and electro start with little or none); the ECHO and REVERB sliders scale them, and past halfway they add echo and reverb even to the dry ones.
 - **Dream:** a dark, slow string pad that blooms open while you hold a key, with a low octave under it, a soft electric-piano tine at the start of each note and a long, reverberant tail.
-- **Glow:** a chime built only from whole-number harmonics (so it has almost no roughness), with a slow shimmer and a soft sparkle that rises up the harmonic series after each note.
+- **Haze:** a soft, airy choir-like pad in the spirit of 1970s tape choirs and ambient synth records. Its low end is cut away so it sits above dream instead of clouding it.
+- **Deep:** a sustained sub bass with a slow glide, voiced to sit underneath dream.
 - **Click:** an optional metronome (60–160 bpm, three volume levels, accent every fourth beat). You hear it and see it (the CLICK button flashes and four beat dots step along the display), but it isn't recorded. The echo time follows its tempo.
 - **Motes:** a little dust lifts off each key you play, and the keys either side shiver. Play with a steady pulse (or in time with the click) and the dust lasts longer, warms in colour, drifts into a slow swirl and links up; lose the pulse and it sinks and fades. It's off if your phone is set to reduce motion.
-- **Hold:** with HOLD on, the sustaining synths (everything but the 808) keep ringing after you lift your finger. Tap a lit key again to stop it, or turn HOLD off to stop them all. Poly voices stack into chords; mono voices keep the last note.
+- **Hold:** with HOLD on, the sustaining synths keep ringing after you lift your finger. Tap a lit key again to stop it, or turn HOLD off to stop them all. Poly voices stack into chords; mono voices keep the last note.
 - **Shape:** the SHAPE button opens eight sliders that work on every sound and are remembered between visits: ECHO (tape delay), REVERB (room), TONE (low-pass cutoff), EDGE (resonance), SWELL (attack), TAIL (decay and release), GRIT (drive) and WOBBLE (an LFO on the filter, in time with the click). Each change plays a short preview; RESET TO STOCK puts everything back.
 - **Greyed-out buttons:** GLIDE and HOLD grey out when they do nothing for the current sound (GLIDE is for the mono synths, HOLD for the sustaining synths).
 - **Recorder:** records the instrument's own output, not the mic. Takes are kept in the browser (IndexedDB), and you can play, save or share, and delete them.
@@ -67,7 +68,7 @@ Edit in `src/`, then run `python3 src/build.py`. You can also edit `index.html` 
 - **Recordings** save as `.webm` on Android and desktop Chrome, and `.mp4` (AAC) on iPhone and Safari.
 - **Haptics** only work on Android. iOS browsers don't expose vibration.
 - **Fonts:** IBM Plex Mono (the instrument) and Fredoka (the opening page) load from Google Fonts. Offline, they fall back to system fonts.
-- **Before a public or commercial release:** "Moog" and "ARP" are trademarks. The voice names are fine for personal use, but generic names are safer for a public launch (for example "ladder" and "lead"). "808" is widely used generically.
+- **Before a public or commercial release:** "Moog" and "ARP" are trademarks. The voice names are fine for personal use, but generic names are safer for a public launch (for example "ladder" and "lead").
 
 ## Ideas for next
 

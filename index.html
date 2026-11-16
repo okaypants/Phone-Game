@@ -206,9 +206,9 @@ function makeDrone(f,pn){if(!AC)return null;const t=now(),o=outNode(pn,1),env=AC
 
 
 
-const SOUNDS=[['wood','#F2B8A2'],['dream','#D48E8E'],['felt','#BFD8B8'],['box','#F3E3A1'],['metal','#C9C3E6'],['glow','#B8E2DC'],
- ['808','#BDBBB4'],['moog','#C9B8A3'],['arp','#AFBBC2'],['electro','#D3D0C8'],['strings','#C6C3B6'],['vox','#B8B0A8']];
-const SOUND_SUB=['warm kalimba','dark string pad · hold','soft piano','music box','gamelan','magic chime','808 bass · glide · dry','ladder bass · mono glide','odyssey lead · mono glide','square lead · poly · dry','string machine · poly','formant voice · mono glide'];
+const SOUNDS=[['wood','#F2B8A2'],['dream','#D48E8E'],['felt','#BFD8B8'],['box','#F3E3A1'],['metal','#C9C3E6'],['haze','#B8E2DC'],
+ ['deep','#9FB0C6'],['moog','#C9B8A3'],['arp','#AFBBC2'],['electro','#D3D0C8'],['strings','#C6C3B6'],['vox','#B8B0A8']];
+const SOUND_SUB=['warm kalimba','dark string pad · hold','soft piano','music box','gamelan','airy tape choir · hold','sub bass · mono glide','ladder bass · mono glide','odyssey lead · mono glide','square lead · poly · dry','string machine · poly','formant voice · mono glide'];
 const ROOTS=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 const ROOT_ALT=['','D♭','','D♯','','','G♭','','G♯','','A♯',''];
 const SCALE_LIST=[['maj','major',[0,2,4,5,7,9,11]],['min','natural minor',[0,2,3,5,7,8,10]],['dor','dorian',[0,2,3,5,7,9,10]],['phr','phrygian',[0,1,3,5,7,8,10]],
@@ -230,7 +230,6 @@ const NAMES=['c','c#','d','d#','e','f','f#','g','g#','a','a#','b'];
 const noteName=f=>{const m=Math.round(69+12*Math.log2(f/440));return NAMES[((m%12)+12)%12]+(Math.floor(m/12)-1)};
 
 function kal(type,f,bright,v,pn){if(!AC)return;const t=now(),o=outNode(pn,v);
-  const wet=(r,d)=>{[[r*2*SHAPE.verb,rIn],[d*2*SHAPE.echo,dIn]].forEach(([amt,dest])=>{if(amt<.002)return;const x=AC.createGain();x.gain.value=amt;o.connect(x);x.connect(dest)})}; // extra room/echo for the dreamy voices
   const tone=AC.createBiquadFilter();tone.type='lowpass';tone.Q.value=.5;tone.frequency.value=type==='felt'?600+bright*1800:1200+bright*7000;tone.connect(o);
   const TM=tailMul(),AT=atkTime(),part=(ratio,gain,dec,wave='sine',det=0,dest=tone,a=.002)=>{dec*=TM;a=Math.max(a,AT*.8); // SWELL: the partial itself blooms late, so slow attacks don't just mute the pluck
    const x=AC.createOscillator();x.type=wave;
@@ -241,22 +240,17 @@ function kal(type,f,bright,v,pn){if(!AC)return;const t=now(),o=outNode(pn,v);
   if(type==='wood'){part(1,.7,2.4);part(6.27,.22*bright,.28);part(17.5,.06*bright,.07);click(2800,1.2,.35*bright+.08,.012)}
   else if(type==='felt'){part(1,.6,1.5,'triangle',0,tone,.008);part(2,.12,.6);click(400,.8,.25,.03)}
   else if(type==='box'){part(2,.5,1.3);part(4,.18*bright+.05,.5);part(6,.08*bright,.2);click(6000,2,.2*bright,.006)}
-  else if(type==='metal'){[1,2.76,5.4,8.93].forEach((r,i)=>part(r,[.5,.22,.13,.06][i]*(i?bright+.3:1),[3.6,2,1.1,.5][i]));part(1,.22,3.6,'sine',-5)}
-  else{ // glow: pure harmonic chime — slow shimmer from a detuned pair, then a soft rising sparkle up the harmonic series
-    part(1,.5,3.4,'sine',0,tone,.008);part(1,.28,3.4,'sine',5,tone,.008);part(2,.2,2.4,'sine',-3);part(3,.07+.07*bright,1.5);
-    [4,6,8,12].forEach((r,i)=>{if(f*r>11000)return;const tt=t+.05*(i+1),x=AC.createOscillator();x.frequency.value=f*r;
-      const g=AC.createGain();x.connect(g);g.connect(tone);adsr(g.gain,tt,.004,.06*(.5+bright)/(1+i*.3),.9-i*.12);x.start(tt);x.stop(tt+1)});
-    wet(.35,.16)}}
+  else if(type==='metal'){[1,2.76,5.4,8.93].forEach((r,i)=>part(r,[.5,.22,.13,.06][i]*(i?bright+.3:1),[3.6,2,1.1,.5][i]));part(1,.22,3.6,'sine',-5)}}
 
 
 // ───────── synth voices (gated: ring while held) ─────────
-const SYN_TYPES=['dream','808','moog','arp','electro','strings','vox'];
+const SYN_TYPES=['dream','haze','deep','moog','arp','electro','strings','vox'];
 // fixed character per instrument (no kalimba-style position/velocity response)
-const SYN_TONE={dream:.5,'808':.55,moog:.55,arp:.6,electro:.5,strings:.5,vox:.5};
-// [delay send, reverb send] per instrument — 808 and electro stay dry
-const SYN_FX={dream:[.05,.6],'808':[0,0],moog:[0,.04],arp:[.1,.14],electro:[0,.05],strings:[0,.32],vox:[.06,.16]};
+const SYN_TONE={dream:.5,haze:.5,deep:.5,moog:.55,arp:.6,electro:.5,strings:.5,vox:.5};
+// [delay send, reverb send] per instrument — electro stays nearly dry
+const SYN_FX={dream:[.05,.6],haze:[.12,.45],deep:[0,.14],moog:[0,.04],arp:[.1,.14],electro:[0,.05],strings:[0,.32],vox:[.06,.16]};
 // monophonic instruments glide (portamento) between held notes
-const MONO={'808':.075,moog:.06,arp:.09,vox:.08};
+const MONO={deep:.12,moog:.06,arp:.09,vox:.08};
 let masterOut=null,driveCurve=null,dryBus=null,dIn=null,rIn=null;
 function synthOut(type,pn,v){const n=AC.createGain();noteGain(n,v);let tail=n;
   if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=clamp(pn,-1,1);n.connect(p);tail=p}
@@ -272,10 +266,12 @@ function synth(type,f,pn){if(!AC)return null;const bright=SYN_TONE[type],v=.8,t=
   const lp=(fr,q,dest)=>{const n=AC.createBiquadFilter();n.type='lowpass';n.frequency.value=fr;n.Q.value=q;n.connect(dest);return n};
   const down=(fr,lim)=>{lim*=Math.pow(2,octave);while(fr>lim)fr/=2;return fr};
   let rel=.2,sus=true;
-  if(type==='808'){const fb=down(f,110),ws=AC.createWaveShaper();ws.curve=driveCurve;const pre=g(.6+bright*1.6,ws);ws.connect(lp(900+bright*2500,.7,amp));
-    const s=osc('sine',fb*2.4,0,pre);s.frequency.setValueAtTime(fb*2.4,t);s.frequency.exponentialRampToValueAtTime(fb,t+.06);
-    const n=noiseSrc(),hp=AC.createBiquadFilter();hp.type='highpass';hp.frequency.value=2000;const ng=g(0,o);n.connect(hp);hp.connect(ng);adsr(ng.gain,t,.001,.12,.008);n.start(t);n.stop(t+.03);
-    amp.gain.setValueAtTime(.0001,t);amp.gain.exponentialRampToValueAtTime(.95,t+.004);amp.gain.exponentialRampToValueAtTime(.0001,t+3.4);rel=.12;sus=false}
+  if(type==='deep'){ // sustained sub: sine with an octave below and a triangle above, driven so small speakers still hear it, with a dark slow-moving saw on top
+    const fb=down(f,98),ws=AC.createWaveShaper();ws.curve=driveCurve;ws.connect(lp(900,.5,amp));const pre=g(.9,ws);
+    osc('sine',fb,0,g(.8,pre));osc('sine',fb/2,0,g(.3,pre));osc('triangle',fb*2,0,g(.3,pre));
+    const fl=lp(320,1.2,amp);fl.frequency.setTargetAtTime(620,t,.6);const top=osc('sawtooth',fb,5,g(.34,fl));osc('sawtooth',fb,-6,g(.26,fl));
+    const ch=AC.createOscillator();ch.frequency.value=.3;const cg=AC.createGain();cg.gain.value=5;ch.connect(cg);cg.connect(top.detune);ch.start(t);nodes.push(ch);
+    amp.gain.setValueAtTime(.0001,t);amp.gain.setTargetAtTime(.62,t,.035);rel=1.1}
   else if(type==='moog'){const fb=down(f,165),f2=lp(300,1,amp),f1=lp(300,9,f2),mix=g(.5,f1);
     osc('sawtooth',fb,0,mix);osc('square',fb,-5,g(.6,mix));osc('sawtooth',fb/2,3,g(.5,mix));
     [f1,f2].forEach(fl=>{fl.frequency.setValueAtTime(220+bright*4200,t);fl.frequency.setTargetAtTime(160+bright*700,t+.01,.12)});
@@ -304,6 +300,14 @@ function synth(type,f,pn){if(!AC)return null;const bright=SYN_TONE[type],v=.8,t=
     const tg=AC.createGain();tg.connect(o);adsr(tg.gain,t,.006,.2,2.2);const car=osc('sine',f,0,tg),mg=AC.createGain();
     mg.gain.setValueAtTime(f*1.1,t);mg.gain.exponentialRampToValueAtTime(f*.06,t+.7);mg.connect(car.frequency);osc('sine',f,0,mg);
     amp.gain.setValueAtTime(.0001,t);amp.gain.setTargetAtTime(.55,t,.11);rel=2.6}
+  else if(type==='haze'){ // airy tape-choir pad: soft saws through "ah" formants, a flute-like body and a little breath, with the lows cut so it floats above dream
+    const hp=AC.createBiquadFilter(),hp2=AC.createBiquadFilter();[hp,hp2].forEach(h=>{h.type='highpass';h.frequency.value=Math.max(400,f*.9);h.Q.value=.6});hp.connect(hp2);hp2.connect(amp);
+    const lfo=AC.createOscillator();lfo.frequency.value=4.4;const lg=AC.createGain();lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(6,t+.9);lfo.connect(lg);lfo.start(t);nodes.push(lfo);
+    const src=AC.createGain();[-8,7].forEach(d=>{const x=osc('sawtooth',f,d,src);lg.connect(x.detune)});
+    [[620,1],[1080,.5],[2400,.22]].forEach(([fr,gn])=>{const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=fr;bp.Q.value=5;src.connect(bp);bp.connect(g(gn*.7,hp))});
+    const body=osc('triangle',f,0,g(.2,hp));lg.connect(body.detune);osc('sine',f*2,4,g(.06,hp));
+    const n=noiseSrc(),nb=AC.createBiquadFilter();nb.type='bandpass';nb.frequency.value=Math.min(6000,f*3);nb.Q.value=1.2;n.connect(nb);nb.connect(g(.035,hp));n.start(t);nodes.push(n);
+    amp.gain.setValueAtTime(.0001,t);amp.gain.setTargetAtTime(.5,t,.13);rel=1.9}
   let done=false;const self={dead:false};
   const kill=r=>{if(done)return;done=true;self.dead=true;const tt=now();amp.gain.cancelScheduledValues(tt);amp.gain.setValueAtTime(Math.max(amp.gain.value,.0001),tt);amp.gain.setTargetAtTime(.0001,tt,r/3);nodes.forEach(n=>{try{n.stop(tt+r*1.7+.3)}catch(e){}})};
   if(!sus)setTimeout(()=>kill(.05),3500);
@@ -349,7 +353,7 @@ function noteOn(t,y,v,id){if(!t)return null;const f=freqOf(t.idx),type=SOUNDS[so
   return{t,voice:synth(type,f,pan(t.x))}}
 // HOLD: sustaining synth notes keep ringing after you let go; tap a lit key again to stop it
 let latch=false,uid=0;const held=new Map();
-const canLatch=()=>isSyn()&&SOUNDS[soundI][0]!=='808';
+const canLatch=()=>isSyn();
 function dropHeld(idx){const x=held.get(idx);if(x){held.delete(idx);noteOff(x.h,x.id)}}
 function latchNote(h,id){const v=h.mono?mono&&mono.voice:h.voice;if(!v||v.dead){noteOff(h,id);return}clearTimeout(v.safety);
   if(h.mono)[...held.keys()].forEach(dropHeld);else dropHeld(h.t.idx);held.set(h.t.idx,{h,id})}

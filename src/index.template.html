@@ -117,9 +117,9 @@ const $=id=>document.getElementById(id);
 
 /*AUDIO*/
 
-const SOUNDS=[['wood','#F2B8A2'],['dream','#D48E8E'],['felt','#BFD8B8'],['box','#F3E3A1'],['metal','#C9C3E6'],['glow','#B8E2DC'],
- ['808','#BDBBB4'],['moog','#C9B8A3'],['arp','#AFBBC2'],['electro','#D3D0C8'],['strings','#C6C3B6'],['vox','#B8B0A8']];
-const SOUND_SUB=['warm kalimba','dark string pad · hold','soft piano','music box','gamelan','magic chime','808 bass · glide · dry','ladder bass · mono glide','odyssey lead · mono glide','square lead · poly · dry','string machine · poly','formant voice · mono glide'];
+const SOUNDS=[['wood','#F2B8A2'],['dream','#D48E8E'],['felt','#BFD8B8'],['box','#F3E3A1'],['metal','#C9C3E6'],['haze','#B8E2DC'],
+ ['deep','#9FB0C6'],['moog','#C9B8A3'],['arp','#AFBBC2'],['electro','#D3D0C8'],['strings','#C6C3B6'],['vox','#B8B0A8']];
+const SOUND_SUB=['warm kalimba','dark string pad · hold','soft piano','music box','gamelan','airy tape choir · hold','sub bass · mono glide','ladder bass · mono glide','odyssey lead · mono glide','square lead · poly · dry','string machine · poly','formant voice · mono glide'];
 const ROOTS=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 const ROOT_ALT=['','D♭','','D♯','','','G♭','','G♯','','A♯',''];
 const SCALE_LIST=[['maj','major',[0,2,4,5,7,9,11]],['min','natural minor',[0,2,3,5,7,8,10]],['dor','dorian',[0,2,3,5,7,9,10]],['phr','phrygian',[0,1,3,5,7,8,10]],
@@ -171,7 +171,7 @@ function noteOn(t,y,v,id){if(!t)return null;const f=freqOf(t.idx),type=SOUNDS[so
   return{t,voice:synth(type,f,pan(t.x))}}
 // HOLD: sustaining synth notes keep ringing after you let go; tap a lit key again to stop it
 let latch=false,uid=0;const held=new Map();
-const canLatch=()=>isSyn()&&SOUNDS[soundI][0]!=='808';
+const canLatch=()=>isSyn();
 function dropHeld(idx){const x=held.get(idx);if(x){held.delete(idx);noteOff(x.h,x.id)}}
 function latchNote(h,id){const v=h.mono?mono&&mono.voice:h.voice;if(!v||v.dead){noteOff(h,id);return}clearTimeout(v.safety);
   if(h.mono)[...held.keys()].forEach(dropHeld);else dropHeld(h.t.idx);held.set(h.t.idx,{h,id})}
